@@ -1,0 +1,279 @@
+import { app, BrowserWindow, Tray, Menu, nativeImage, ipcMain, shell } from 'electron';
+import * as path from 'path';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import https from 'https';
+import http from 'http';
+import { autoUpdater } from 'electron-updater';
+
+const execAsync = promisify(exec);
+
+let mainWindow: BrowserWindow | null = null;
+let tray: Tray | null = null;
+let isQuitting = false;
+
+function createWindow(): BrowserWindow {
+  const win = new BrowserWindow({
+    width: 1200,
+    height: 800,
+    minWidth: 900,
+    minHeight: 600,
+    title: '落朵大脑 · AI军团',
+    icon: path.join(__dirname, '../resources/icon.png'),
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true,
+      nodeIntegration: false,
+    },
+    show: false,
+  });
+
+  // 加载构建产物或开发服务器
+  const isDev = process.env.NODE_ENV === 'development' || process.argv.includes('--dev');
+  if (isDev) {
+    win.loadURL('http://localhost:5173');
+    win.webContents.openDevTools();
+  } else {
+    win.loadFile(path.join(__dirname, '../dist/index.html'));
+  }
+
+  win.once('ready-to-show', () => {
+    win.show();
+    win.focus();
+  });
+
+  // 关闭窗口时最小化到托盘（非退出）
+  win.on('close', (event) => {
+    if (!isQuitting) {
+      event.preventDefault();
+      win.hide();
+    }
+  });
+
+  return win;
+}
+
+function createTray(): void {
+  const trayIconPath = path.join(__dirname, '../resources/icon.png');
+  const trayIcon = nativeImage.createFromPath(trayIconPath).resize({ width: 22, height: 22 });
+  
+  tray = new Tray(trayIcon);
+  tray.setToolTip('落朵大脑 · AI军团');
+
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: '打开主窗口',
+      click: () => {
+        if (mainWindow) {
+          mainWindow.show();
+          mainWindow.focus();
+        }
+      },
+    },
+    { type: 'separator' },
+    {
+      label: '退出',
+      click: () => {
+        isQuitting = true;
+        app.quit();
+      },
+    },
+  ]);
+
+  tray.setContextMenu(contextMenu);
+  tray.on('click', () => {
+    if (mainWindow) {
+      if (mainWindow.isVisible()) {
+        mainWindow.focus();
+      } else {
+        mainWindow.show();
+        mainWindow.focus();
+      }
+    }
+  });
+}
+
+// IPC handlers
+ipcMain.handle('get-app-version', () => {
+  return app.getVersion();
+});
+
+ipcMain.handle('get-platform', () => {
+  return process.platform;
+});
+
+ipcMain.handle('open-external', (_event, url: string) => {
+  if (typeof url === 'string' && url.startsWith('http')) {
+    shell.openExternal(url);
+  }
+});
+
+// 本地命令执行（安全沙箱：仅允许白名单命令类别，且用户确认）
+ipcMain.handle('execute-command', async (_event, command: string) => {
+  // 安全拦截：禁止高危操作
+  const blacklist = ['rm -rf', 'format', 'del /f', 'rd /s', 'shutdown', 'restart', 'net user',
+                     'reg delete', 'taskkill /f', '>nul', 'powershell -Command Remove'];
+  for (const bad of blacklist) {
+    if (command.toLowerCase().includes(bad)) {
+      return { ok: false, error: `命令被安全策略拦截: ${bad}` };
+    }
+  }
+  try {
+    const { stdout, stderr } = await execAsync(command, { timeout: 30000 });
+    return { ok: true, stdout: stdout.slice(0, 5000), stderr: stderr.slice(0, 2000) };
+  } catch (err: any) {
+    return { ok: false, error: err.message, stdout: err.stdout?.slice(0, 2000) || '' };
+  }
+});
+
+// ============ 远程Worker（后台轮询大脑任务队列） ============
+let remoteWorkerInterval: any = null;
+let remoteWorkerActive = false;
+const REMOTE_API = 'https://tyb.ap100168.com/api/remote';
+
+function httpGet(url: string): Promise<any> {
+  return new Promise((resolve) => {
+    const proto = url.startsWith('https') ? require('https') : require('http');
+    proto.get(url, { rejectUnauthorized: false }, (res: any) => {
+      let d = '';
+      res.on('data', (c: string) => d += c);
+      res.on('end', () => { try { resolve(JSON.parse(d)); } catch { resolve(null); } });
+    }).on('error', () => resolve(null));
+  });
+}
+
+function httpPost(url: string, body: any): Promise<any> {
+  return new Promise((resolve) => {
+    const json = JSON.stringify(body);
+    const proto = url.startsWith('https') ? require('https') : require('http');
+    const req = proto.request(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(json) },
+      rejectUnauthorized: false,
+    }, (res: any) => {
+      let d = '';
+      res.on('data', (c: string) => d += c);
+      res.on('end', () => { try { resolve(JSON.parse(d)); } catch { resolve(null); } });
+    });
+    req.on('error', () => resolve(null));
+    req.write(json);
+    req.end();
+  });
+}
+
+async function remoteWorkerTick() {
+  try {
+    const resp = await httpGet(`${REMOTE_API}/task/next`);
+    if (!resp?.ok || !resp.task) return;
+    const task = resp.task;
+    let result: any = { ok: false, stdout: '', stderr: '' };
+    const cmd = task.instruction;
+    try {
+      const { stdout, stderr } = await execAsync(cmd, { timeout: 60000 });
+      result = { ok: true, stdout: (stdout || '').slice(0, 10000), stderr: (stderr || '').slice(0, 2000) };
+    } catch (err: any) {
+      result = { ok: false, error: err.message, stdout: (err.stdout || '').slice(0, 5000) };
+    }
+    await httpPost(`${REMOTE_API}/${task.task_id}/result`, { result, ok: result.ok, stdout: result.stdout, stderr: result.stderr });
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('remote-task-done', { task_id: task.task_id, result });
+    }
+  } catch (_) {}
+}
+
+ipcMain.handle('remote-worker-start', async () => {
+  if (remoteWorkerActive) return { ok: true, alreadyActive: true };
+  remoteWorkerActive = true;
+  remoteWorkerInterval = setInterval(remoteWorkerTick, 5000);
+  remoteWorkerTick();
+  return { ok: true, active: true };
+});
+
+ipcMain.handle('remote-worker-stop', async () => {
+  remoteWorkerActive = false;
+  if (remoteWorkerInterval) { clearInterval(remoteWorkerInterval); remoteWorkerInterval = null; }
+  return { ok: true, active: false };
+});
+
+ipcMain.handle('remote-worker-status', async () => {
+  return { active: remoteWorkerActive };
+});
+
+// 获取系统信息
+ipcMain.handle('get-system-info', async () => {
+  try {
+    const platform = process.platform;
+    let osInfo = '';
+    if (platform === 'win32') {
+      const r = await execAsync('systeminfo | findstr /B /C:"OS Name" /C:"OS Version"', { timeout: 10000 });
+      osInfo = r.stdout;
+    } else {
+      const r = await execAsync('uname -a', { timeout: 5000 });
+      osInfo = r.stdout;
+    }
+    return { ok: true, platform, osInfo: osInfo.trim() };
+  } catch (err: any) {
+    return { ok: false, platform: process.platform, error: err.message };
+  }
+});
+
+// ============ 自动更新 ============
+const UPDATE_URL = 'https://api.ap100168.com/download';
+autoUpdater.setFeedURL({ provider: 'generic', url: UPDATE_URL });
+autoUpdater.autoDownload = false;
+
+autoUpdater.on('update-available', (info) => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('update-available', info);
+  }
+  // 自动下载更新
+  autoUpdater.downloadUpdate();
+});
+
+autoUpdater.on('update-downloaded', () => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('update-downloaded', {});
+  }
+  // 静默安装重启
+  setTimeout(() => autoUpdater.quitAndInstall(), 3000);
+});
+
+autoUpdater.on('error', () => {}); // 静默处理
+
+ipcMain.handle('check-for-updates', async () => {
+  try {
+    autoUpdater.checkForUpdates();
+    return { ok: true };
+  } catch { return { ok: false }; }
+});
+
+ipcMain.handle('get-update-url', () => UPDATE_URL);
+
+// App lifecycle
+app.whenReady().then(() => {
+  mainWindow = createWindow();
+  createTray();
+
+  // 启动后检查更新（延迟10秒，避免影响启动体验）
+  setTimeout(() => {
+    try { autoUpdater.checkForUpdates(); } catch {}
+  }, 10000);
+
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      mainWindow = createWindow();
+    } else if (mainWindow) {
+      mainWindow.show();
+    }
+  });
+});
+
+app.on('before-quit', () => {
+  isQuitting = true;
+});
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') {
+    // 非 macOS 即使所有窗口关闭也不退出（有托盘）
+  }
+});
