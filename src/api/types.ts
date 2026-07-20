@@ -1,7 +1,9 @@
 export interface Agent {
   id: string;
   label: string;
-  doc_type: string;
+  doc_type?: string;
+  role?: string;
+  emoji?: string;
 }
 
 export interface AgentResponse {

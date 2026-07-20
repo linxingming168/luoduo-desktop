@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { getServerUrl, setServerUrl } from '../api/client';
-import { Settings as SettingsIcon, Globe, Moon, Sun, Info, Save } from 'lucide-react';
+import { getServerUrl, setServerUrl, getApiKey, setApiKey } from '../api/client';
+import { Settings as SettingsIcon, Globe, Moon, Sun, Info, Save, KeyRound } from 'lucide-react';
 
 export default function Settings() {
   const [serverUrl, setLocalUrl] = useState(getServerUrl());
+  const [apiKey, setLocalKey] = useState(getApiKey());
   const [saved, setSaved] = useState(false);
   const [darkMode, setDarkMode] = useState(
     document.documentElement.classList.contains('dark')
@@ -11,6 +12,7 @@ export default function Settings() {
 
   const handleSave = () => {
     setServerUrl(serverUrl);
+    setApiKey(apiKey);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
@@ -56,6 +58,24 @@ export default function Settings() {
               {saved ? '已保存' : '保存'}
             </button>
           </div>
+        </div>
+
+        {/* API Key */}
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <KeyRound className="w-4 h-4 text-yellow-500" />
+            <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">API Key（发消息鉴权）</h2>
+          </div>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+            落朵大脑接口需要密钥才能执行智能体。填入后随请求以 <code className="px-1 rounded bg-gray-100 dark:bg-gray-700">?api_key=</code> 传递。智能体列表无需密钥即可加载。
+          </p>
+          <input
+            type="password"
+            value={apiKey}
+            onChange={e => setLocalKey(e.target.value)}
+            placeholder="粘贴你的 API Key"
+            className="w-full px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+          />
         </div>
 
         {/* Theme */}

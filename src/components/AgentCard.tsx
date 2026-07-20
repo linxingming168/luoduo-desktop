@@ -21,7 +21,8 @@ const docTypeColors: Record<string, string> = {
 };
 
 export default function AgentCard({ agent, onClick }: Props) {
-  const colorClass = docTypeColors[agent.doc_type] || docTypeColors.none;
+  const dt = agent.doc_type || 'none';
+  const colorClass = docTypeColors[dt] || docTypeColors.none;
 
   return (
     <button
@@ -29,7 +30,7 @@ export default function AgentCard({ agent, onClick }: Props) {
       className="flex items-center gap-3 p-4 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md transition-all text-left w-full group"
     >
       <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${colorClass}`}>
-        {docTypeIcons[agent.doc_type] || <User className="w-5 h-5" />}
+        {docTypeIcons[dt] || <User className="w-5 h-5" />}
       </div>
       <div className="flex-1 min-w-0">
         <div className="font-medium text-gray-900 dark:text-gray-100 truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
