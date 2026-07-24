@@ -1,14 +1,27 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { getServerUrl, setServerUrl, getApiKey, setApiKey } from '../api/client';
-import { Settings as SettingsIcon, Globe, Moon, Sun, Info, Save, KeyRound } from 'lucide-react';
+import { Settings as SettingsIcon, Globe, Moon, Sun, Info, Save, KeyRound, AlertTriangle } from 'lucide-react';
+import { useServerHealth } from '../hooks/useServerHealth';
 
 export default function Settings() {
   const [serverUrl, setLocalUrl] = useState(getServerUrl());
   const [apiKey, setLocalKey] = useState(getApiKey());
   const [saved, setSaved] = useState(false);
+  const [appVersion, setAppVersion] = useState('...');
+  const { online, updateAvailable, serverVersion, clientVersion } = useServerHealth();
   const [darkMode, setDarkMode] = useState(
     document.documentElement.classList.contains('dark')
   );
+
+  // 从 Electron 主进程读取版本号
+  useEffect(() => {
+    const api = (window as any).electronAPI;
+    if (api?.getAppVersion) {
+      api.getAppVersion().then((v: string) => setAppVersion(v)).catch(() => setAppVersion(clientVersion));
+    } else {
+      setAppVersion(clientVersion);
+    }
+  }, [clientVersion]);
 
   const handleSave = () => {
     setServerUrl(serverUrl);
@@ -100,7 +113,13 @@ export default function Settings() {
           </div>
           <div className="space-y-1 text-sm text-gray-500 dark:text-gray-400">
             <p><span className="text-gray-700 dark:text-gray-300">应用：</span>落朵大脑 · AI军团</p>
-            <p><span className="text-gray-700 dark:text-gray-300">版本：</span>1.0.0</p>
+            <p><span className="text-gray-700 dark:text-gray-300">版本：</span>{appVersion}</p>
+            {updateAvailable && (
+              <p className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 pt-1">
+                <AlertTriangle className="w-3.5 h-3.5" />
+                后端新版本 v{serverVersion} 可用，请升级客户端
+              </p>
+            )}
             <p><span className="text-gray-700 dark:text-gray-300">公司：</span>惠州市兴华科技有限公司</p>
             <p className="pt-2 text-xs text-gray-400 dark:text-gray-500">
               基于 Electron + React 构建。连接到 AI 军团大脑服务器使用。

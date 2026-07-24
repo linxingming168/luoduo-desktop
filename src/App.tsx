@@ -10,13 +10,13 @@ import LocalConsole from './pages/LocalConsole';
 import RemoteWorker from './pages/RemoteWorker';
 import Settings from './pages/Settings';
 import { useServerHealth } from './hooks/useServerHealth';
-import { Bot } from 'lucide-react';
+import { Bot, AlertTriangle } from 'lucide-react';
 
 export default function App() {
   const [page, setPage] = useState('dashboard');
   const [chatAgent, setChatAgent] = useState<string | undefined>();
   const [darkMode, setDarkMode] = useState(false);
-  const { online } = useServerHealth();
+  const { online, updateAvailable, serverVersion, clientVersion } = useServerHealth();
 
   // 初始化暗色模式
   useEffect(() => {
@@ -46,6 +46,21 @@ export default function App() {
         onToggleDark={toggleDark}
       />
       <main className="flex-1 overflow-hidden flex flex-col">
+        {/* 版本升级提示条 */}
+        {updateAvailable && (
+          <div className="flex items-center gap-2 px-4 py-2 bg-amber-50 dark:bg-amber-900/30 border-b border-amber-200 dark:border-amber-700 text-sm">
+            <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+            <span className="text-amber-800 dark:text-amber-200">
+              检测到新版本 <strong>v{serverVersion}</strong>（当前客户端 v{clientVersion}），请前往 GitHub 下载最新版本或联系管理员升级。
+            </span>
+            <button
+              onClick={() => (window as any).electronAPI?.openExternal?.('https://github.com/linxingming168/luoduo-desktop/releases')}
+              className="ml-2 px-3 py-1 rounded bg-amber-500 hover:bg-amber-600 text-white text-xs font-medium transition-colors flex-shrink-0"
+            >
+              下载
+            </button>
+          </div>
+        )}
         {/* Small header bar on mobile */}
         <div className="md:hidden flex items-center gap-2 px-4 py-2 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
           <Bot className="w-4 h-4 text-blue-500" />

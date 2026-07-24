@@ -42,4 +42,5 @@ export interface HealthStatus {
   agents?: number;
   skills?: number;
   knowledge?: number;
+  version?: string;
 }
