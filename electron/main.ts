@@ -24,6 +24,9 @@ function createWindow(): BrowserWindow {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
+      // 桌面端以 file:// 源加载，渲染进程直连自有后端 tyb.ap100168.com 会被 CORS 拦截。
+      // 关闭渲染进程 web 安全策略以放行自有后端调用（内部本地 AI 客户端，可接受）。
+      webSecurity: false,
     },
     show: false,
   });
