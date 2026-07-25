@@ -1,0 +1,84 @@
+{
+  "name": "luoduo-desktop",
+  "version": "2.1.9",
+  "description": "兴华AI军团·落朵大脑 桌面原生客户端",
+  "author": {
+    "name": "惠州市兴华科技有限公司",
+    "email": "616865834@qq.com"
+  },
+  "homepage": "https://tyb.ap100168.com",
+  "main": "dist-electron/main.js",
+  "scripts": {
+    "dev:web": "vite",
+    "build:web": "tsc && vite build",
+    "build:electron": "tsc -p tsconfig.electron.json",
+    "build": "npm run build:web && npm run build:electron",
+    "start": "electron .",
+    "pack": "npm run build && electron-builder --dir",
+    "dist": "npm run build && electron-builder"
+  },
+  "dependencies": {
+    "@xyflow/react": "^12.11.2",
+    "axios": "^1.6.0",
+    "electron-updater": "^6.8.9",
+    "lucide-react": "^0.300.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-markdown": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "autoprefixer": "^10.4.0",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.0.0",
+    "postcss": "^8.4.0",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.3.0",
+    "vite": "^5.0.0"
+  },
+  "build": {
+    "appId": "com.xinghua.luoduo-desktop",
+    "publish": {
+      "provider": "github",
+      "owner": "linxingming168",
+      "repo": "luoduo-desktop"
+    },
+    "productName": "落朵大脑·AI军团",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "resources/**/*"
+    ],
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "icon": "resources/icon.png",
+      "category": "Utility"
+    },
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "icon": "resources/icon.png"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "resources/icon.png"
+    }
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "electron",
+      "esbuild"
+    ]
+  }
+}
