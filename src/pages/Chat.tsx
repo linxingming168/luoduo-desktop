@@ -41,6 +41,32 @@ export default function Chat({ initialAgent }: { initialAgent?: string }) {
     setAttachments(prev => prev.filter((_, i) => i !== idx));
   };
 
+  // 选本地音乐文件 → 直接本地播放（绝对合规，零外部依赖）
+  const handlePickMusic = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    const url = URL.createObjectURL(f);
+    setActiveArtifact({ type: 'audio', lang: 'audio', code: url, title: f.name, url });
+    e.target.value = '';
+  };
+
+  // 开放音乐（AudioLib 合规原创音源）：需配置 API Key
+  const handleOpenMusic = async () => {
+    const key = localStorage.getItem('luoduo_audiolib_key') || '';
+    if (!key) { alert('未配置 AudioLib Key。请到「设置」页填写（audiolib.ai 注册免费获取），即可听开放原创音乐。'); return; }
+    const library = (window.prompt('选择风格曲库（如 lofi / focus / rock / sleep，默认 lofi）', 'lofi') || 'lofi').trim();
+    try {
+      const r = await fetch('https://api.audiolib.ai/v1/audio', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}` },
+        body: JSON.stringify({ library }),
+      });
+      const j = await r.json();
+      if (j?.url) setActiveArtifact({ type: 'audio', lang: 'audio', code: j.url, title: `${library}.mp3`, url: j.url });
+      else alert('AudioLib 返回异常：' + JSON.stringify(j));
+    } catch (err: any) { alert('AudioLib 调用失败：' + (err?.message || err)); }
+  };
+
   // 载入智能体名册（来自后端 /api/health）
   useEffect(() => {
     api.getAgents().then(r => setAgents(r.agents)).catch(() => setAgents([]));
@@ -84,8 +110,8 @@ export default function Chat({ initialAgent }: { initialAgent?: string }) {
         }
         return next;
       });
-      // HTML 类产物自动开右侧预览
-      if (artifact && artifact.type === 'html') setActiveArtifact(artifact);
+      // HTML / 音频 类产物自动开右侧预览
+      if (artifact && (artifact.type === 'html' || artifact.type === 'audio')) setActiveArtifact(artifact);
     } catch (e: any) {
       const msg = e?.message || '请求失败，请检查后端连接';
       setMessages(prev => {
@@ -200,6 +226,8 @@ export default function Chat({ initialAgent }: { initialAgent?: string }) {
             onStop={() => setLoading(false)}
             onFile={handlePick}
             onDir={handlePick}
+            onMusic={handlePickMusic}
+            onOpenMusic={handleOpenMusic}
             onVoice={() => {}}
             loading={loading}
             placeholder={agentId ? `对 ${ROSTER[agentId]?.label || agentId} 说点什么…` : '自由对话...'}

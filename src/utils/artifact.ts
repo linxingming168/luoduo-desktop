@@ -1,11 +1,12 @@
-// 从 AI 回复中抽取可预览的产物（HTML 网页/游戏、或代码块）
+// 从 AI 回复中抽取可预览的产物（HTML 网页/游戏、代码块、或音频直链）
 // 返回：剥离代码后的正文文本 + 产物对象（无则 null）
 
 export interface Artifact {
-  type: 'html' | 'code';
-  lang: string;   // 'html' | 'js' | 'python' | 'css' | ...
+  type: 'html' | 'code' | 'audio';
+  lang: string;   // 'html' | 'js' | 'python' | 'css' | 'audio' | ...
   code: string;
-  title: string;  // 例如「贪食蛇.html」「代码.js」
+  title: string;  // 例如「贪食蛇.html」「代码.js」「音乐.mp3」
+  url?: string;   // audio 类型：音频直链
 }
 
 const HTML_HINT = /<!doctype html|<html[\s>]/i;
@@ -13,6 +14,13 @@ const HTML_HINT = /<!doctype html|<html[\s>]/i;
 const HTML_FRAGMENT_HINT = /<(canvas|div|body|style|script|svg|button|form|table)[\s>][\s\S]*<\/(canvas|div|body|style|script|svg|button|form|table)>/i;
 // 小于该长度的普通代码块不抽成产物（保留在正文里直接看）
 const MIN_CODE_ARTIFACT_LEN = 160;
+
+// 音频直链（音乐）：markdown ![名](url) / 标签【音乐】url / 裸链接
+// 仅识别开放/合规音源直链（.mp3/.ogg/.wav/.m4a/.flac/.aac），不碰任何版权灰区
+const AUDIO_MD_RE = /\[([^\]]*)\]\((https?:\/\/[^\s)]+\.(?:mp3|ogg|wav|m4a|flac|aac))\)/i;
+const AUDIO_TAG_RE = /(?:【音乐】|🎵|🎧|\[音乐\])\s*(https?:\/\/[^\s)]+\.(?:mp3|ogg|wav|m4a|flac|aac))/i;
+const AUDIO_URL_RE = /(https?:\/\/[^\s)]+\.(?:mp3|ogg|wav|m4a|flac|aac))/i;
+const AUDIO_PLACEHOLDER = '🎵 已生成可播放的音乐 —— 右侧预览面板可直接播放（开放 / 合规音源）。';
 
 function guessTitle(lang: string, code: string, isHtml: boolean): string {
   if (isHtml) {
@@ -42,6 +50,18 @@ const CODE_PLACEHOLDER = '📦 已生成代码 —— 见下方卡片，可查�
 
 export function extractArtifact(reply: string): { text: string; artifact: Artifact | null } {
   if (!reply) return { text: reply, artifact: null };
+
+  // 0) 音频直链（音乐优先）：markdown / 标签 / 裸链接
+  const md = reply.match(AUDIO_MD_RE);
+  const tag = reply.match(AUDIO_TAG_RE);
+  const bare = reply.match(AUDIO_URL_RE);
+  const audioMatch = md || tag || bare;
+  if (audioMatch) {
+    const url = md ? md[2] : (tag ? audioMatch[1] : bare![1]);
+    const name = (md && md[1].trim()) || '音乐';
+    const text = reply.replace(audioMatch[0], AUDIO_PLACEHOLDER).trim();
+    return { text, artifact: { type: 'audio', lang: 'audio', code: url, title: `${name}.mp3`, url } };
+  }
 
   // 1) 优先解析 ```lang ... ``` 围栏代码块
   const fenceRe = /```([a-zA-Z0-9+#-]*)\r?\n([\s\S]*?)```/g;
@@ -84,9 +104,9 @@ export function extractArtifact(reply: string): { text: string; artifact: Artifa
   }
 
   // 2) 无围栏时，识别裸 HTML 文档
-  const bare = reply.match(/<!doctype html[\s\S]*?<\/html>/i) || reply.match(/<html[\s\S]*?<\/html>/i);
-  if (bare) {
-    const code = bare[0];
+  const bareHtml = reply.match(/<!doctype html[\s\S]*?<\/html>/i) || reply.match(/<html[\s\S]*?<\/html>/i);
+  if (bareHtml) {
+    const code = bareHtml[0];
     const text = reply.replace(code, HTML_PLACEHOLDER).trim();
     return {
       text,
@@ -114,6 +134,16 @@ export function buildPreviewDoc(a: Artifact): string {
 
 // 浏览器/Electron 渲染进程通用的 Blob 下载
 export function downloadArtifact(a: Artifact): void {
+  // 音频：直接下载直链（开放/合规音源）
+  if (a.type === 'audio' && a.url) {
+    const link = document.createElement('a');
+    link.href = a.url;
+    link.download = a.title;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    return;
+  }
   const mime = a.type === 'html' ? 'text/html' : 'text/plain';
   const blob = new Blob([a.code], { type: `${mime};charset=utf-8` });
   const url = URL.createObjectURL(blob);
@@ -126,15 +156,16 @@ export function downloadArtifact(a: Artifact): void {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-// 复制代码到剪贴板（带降级方案）
+// 复制代码到剪贴板（带降级方案）；音频复制直链
 export async function copyArtifactCode(a: Artifact): Promise<boolean> {
+  const text = a.type === 'audio' ? (a.url || a.code) : a.code;
   try {
-    await navigator.clipboard.writeText(a.code);
+    await navigator.clipboard.writeText(text);
     return true;
   } catch {
     try {
       const ta = document.createElement('textarea');
-      ta.value = a.code;
+      ta.value = text;
       ta.style.position = 'fixed';
       ta.style.opacity = '0';
       document.body.appendChild(ta);

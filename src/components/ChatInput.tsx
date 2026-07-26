@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { Mic, Paperclip, Folder, Send, Square } from 'lucide-react';
+import { Mic, Paperclip, Folder, Music, Headphones, Send, Square } from 'lucide-react';
 
 interface Props {
   value: string;
@@ -8,14 +8,17 @@ interface Props {
   onStop: () => void;
   onFile: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onDir: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onMusic: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onOpenMusic: () => void;
   onVoice: () => void;
   loading: boolean;
   placeholder?: string;
 }
 
-export default function ChatInput({ value, onChange, onSend, onStop, onFile, onDir, onVoice, loading, placeholder }: Props) {
+export default function ChatInput({ value, onChange, onSend, onStop, onFile, onDir, onMusic, onOpenMusic, onVoice, loading, placeholder }: Props) {
   const fileRef = useRef<HTMLInputElement>(null);
   const dirRef = useRef<HTMLInputElement>(null);
+  const musicRef = useRef<HTMLInputElement>(null);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -50,6 +53,22 @@ export default function ChatInput({ value, onChange, onSend, onStop, onFile, onD
           <Folder className="w-4 h-4" />
         </button>
         <input ref={dirRef} type="file" className="hidden" onChange={onDir} {...{ webkitdirectory: "" } as any} multiple />
+
+        {/* Music: 本地音乐文件（绝对合规，零外部依赖） */}
+        <button onClick={() => musicRef.current?.click()}
+          className="p-2 rounded-lg text-gray-400 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+          title="选择本地音乐">
+          <Music className="w-4 h-4" />
+        </button>
+        <input ref={musicRef} type="file" className="hidden" onChange={onMusic}
+          accept=".mp3,.ogg,.wav,.m4a,.flac,.aac" />
+
+        {/* Open music: 开放/合规音源（AudioLib 原创可商用） */}
+        <button onClick={onOpenMusic}
+          className="p-2 rounded-lg text-gray-400 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+          title="开放音乐（AudioLib）">
+          <Headphones className="w-4 h-4" />
+        </button>
 
         {/* Text input */}
         <input

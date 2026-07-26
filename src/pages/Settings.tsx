@@ -11,6 +11,7 @@ export default function Settings() {
   const { online, updateAvailable, serverVersion, clientVersion } = useServerHealth();
   const [updateChecking, setUpdateChecking] = useState(false);
   const [updateResult, setUpdateResult] = useState('');
+  const [audiolibKey, setAudiolibKey] = useState(localStorage.getItem('luoduo_audiolib_key') || '');
 
   // 从 Electron 主进程读取版本号
   useEffect(() => {
@@ -25,6 +26,7 @@ export default function Settings() {
   const handleSave = () => {
     setServerUrl(serverUrl);
     setApiKey(apiKey);
+    localStorage.setItem('luoduo_audiolib_key', audiolibKey);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
@@ -114,13 +116,40 @@ export default function Settings() {
               onClick={handleSave}
               className="px-4 py-2 rounded-lg bg-gray-900 hover:bg-gray-800 text-white text-sm transition-colors flex items-center gap-1.5 shrink-0"
             >
-              <Save className="w-3.5 h-3.5" />
-              {saved ? '已保存' : '保存'}
-            </button>
-          </div>
+            <Save className="w-3.5 h-3.5" />
+            {saved ? '已保存' : '保存'}
+          </button>
         </div>
+      </div>
 
-        {/* About */}
+      {/* Open Music: AudioLib Key（开放/合规原创音源） */}
+      <div className="bg-white border border-gray-200 rounded-xl p-5">
+        <div className="flex items-center gap-2 mb-3">
+          <KeyRound className="w-4 h-4 text-gray-500" />
+          <h2 className="text-sm font-semibold text-gray-900">开放音乐 Key（AudioLib）</h2>
+        </div>
+        <p className="text-xs text-gray-500 mb-3">
+          接入 AudioLib 开放原创音乐（10万+ 首、零版权风险、可商用）。到 <a href="https://audiolib.ai" target="_blank" rel="noreferrer" className="text-gray-700 underline">audiolib.ai</a> 注册免费获取 API Key，填入后对话中点「🎧 开放音乐」即可听。仅接合规授权音源。
+        </p>
+        <div className="flex gap-2">
+          <input
+            type="password"
+            value={audiolibKey}
+            onChange={e => setAudiolibKey(e.target.value)}
+            placeholder="粘贴 AudioLib API Key（alp_ 开头）"
+            className="flex-1 px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-400 font-mono"
+          />
+          <button
+            onClick={handleSave}
+            className="px-4 py-2 rounded-lg bg-gray-900 hover:bg-gray-800 text-white text-sm transition-colors flex items-center gap-1.5 shrink-0"
+          >
+            <Save className="w-3.5 h-3.5" />
+            {saved ? '已保存' : '保存'}
+          </button>
+        </div>
+      </div>
+
+      {/* About */}
         <div className="bg-white border border-gray-200 rounded-xl p-5">
           <div className="flex items-center gap-2 mb-3">
             <Info className="w-4 h-4 text-gray-500" />
