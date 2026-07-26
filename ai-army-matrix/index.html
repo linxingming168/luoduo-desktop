@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>兴华AI军团矩阵 · 14智能体体系</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+    background:#ffffff;color:#1a1a1a;padding:28px 32px 56px;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1080px;margin:0 auto}
+  h1{font-size:21px;font-weight:600;letter-spacing:-0.2px}
+  .sub{color:#6b6b6b;font-size:13.5px;margin-top:6px}
+  .topbar{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:8px}
+  .actions{display:flex;align-items:center;gap:10px;flex-shrink:0;margin-top:2px}
+  .stamp{font-size:12px;color:#9a9a9a;white-space:nowrap}
+  .ubtn{border:0.5px solid #1a1a1a;background:#fff;color:#1a1a1a;padding:6px 16px;border-radius:20px;font-size:13px;cursor:pointer;transition:.15s}
+  .ubtn:hover{background:#1a1a1a;color:#fff}
+  .ubtn:disabled{opacity:.5;cursor:default}
+  .core{background:#fafafa;border:0.5px solid #ebebeb;border-radius:12px;
+    padding:16px 20px;display:flex;align-items:center;gap:16px;margin:18px 0;}
+  .core .badge{border:0.5px solid #1a1a1a;color:#1a1a1a;font-size:12px;padding:3px 12px;border-radius:20px;white-space:nowrap}
+  .core .nm{font-size:16px;font-weight:600}
+  .core .rl{font-size:13px;color:#6b6b6b;margin-top:3px}
+  .legend{font-size:12.5px;color:#9a9a9a;margin:18px 0 4px}
+  .legend b{color:#6b6b6b;font-weight:500}
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 22px}
+  .filters button{border:0.5px solid #e0e0e0;background:#fff;color:#6b6b6b;
+    padding:6px 14px;border-radius:20px;font-size:13px;cursor:pointer;transition:.15s;}
+  .filters button:hover{border-color:#b0b0b0}
+  .filters button.on{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+  .group{margin-bottom:24px}
+  .group h2{font-size:14px;font-weight:600;margin-bottom:3px}
+  .group .gh{font-size:12.5px;color:#9a9a9a;margin-bottom:12px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+  .card{background:#fff;border:0.5px solid #ebebeb;border-radius:12px;padding:14px 16px;transition:.15s;}
+  .card:hover{border-color:#cfcfcf}
+  .card .en{font-size:11.5px;color:#b0b0b0;font-family:ui-monospace,monospace;text-transform:uppercase;letter-spacing:.5px}
+  .card .nm{font-size:15px;font-weight:600;margin:2px 0 6px}
+  .card .rl{font-size:13px;color:#6b6b6b;min-height:38px}
+  .card .eco{font-size:11.5px;color:#9a9a9a;margin-top:8px;padding-top:8px;border-top:0.5px solid #f0f0f0}
+  .card .eco b{color:#1a1a1a;font-weight:600}
+  .hidden{display:none!important}
+  .sec-title{font-size:14px;font-weight:600;margin:34px 0 14px;padding-left:10px;border-left:3px solid #1a1a1a}
+  .eco-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+  .eco-card{background:#fff;border:0.5px solid #ebebeb;border-radius:12px;padding:14px 16px}
+  .eco-card .host{font-size:12.5px;font-weight:600;font-family:ui-monospace,monospace;color:#1a1a1a}
+  .eco-card .nm{font-size:14px;margin:4px 0 8px;color:#1a1a1a}
+  .eco-card .tag{font-size:11.5px;background:#f5f5f5;border:0.5px solid #ececec;padding:3px 9px;border-radius:6px;color:#6b6b6b;display:inline-block}
+  .foot{margin-top:40px;font-size:12px;color:#9a9a9a;border-top:0.5px solid #ececec;padding-top:16px}
+  .noscript{background:#fafafa;border:0.5px solid #e0e0e0;color:#6b6b6b;padding:10px 14px;border-radius:8px;font-size:13px;margin:14px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <h1>兴华 AI 军团矩阵</h1>
+      <div class="sub">1 总控 + 7 基础理科 + 2 工程制造 + 2 软件信息 + 2 业务特色 = 14 智能体体系</div>
+    </div>
+    <div class="actions">
+      <span id="stamp" class="stamp">最后更新：—</span>
+      <button id="updateBtn" class="ubtn">更新</button>
+    </div>
+  </div>
+
+  <div class="core">
+    <span class="badge">总控</span>
+    <div>
+      <div class="nm">SkyDuo Agent · 天朵总调度</div>
+      <div class="rl">全局调度与跨 Agent 协同中枢，统一接收指令、分发任务、汇总 14 智能体成果，对接落朵大脑与 9 大生态系统。</div>
+    </div>
+  </div>
+
+  <noscript><div class="noscript">当前预览未执行 JavaScript，已为你显示完整静态内容；筛选与「更新」按钮需 JS 支持，不影响查看。</div></noscript>
+
+  <div class="legend"><b>分类</b>　基础理科 · 工程制造 · 软件信息 · 业务特色</div>
+
+  <div class="filters" id="filters">
+    <button class="on" data-f="all">全部</button>
+    <button data-f="理科">基础理科</button>
+    <button data-f="工程">工程制造</button>
+    <button data-f="软件">软件信息</button>
+    <button data-f="业务">业务特色</button>
+  </div>
+
+  <!-- 静态卡片：初始渲染 + 无 JS 兜底，保证不白板 -->
+  <div id="matrix">
+  <div class="group" data-cat="理科">
+    <h2>基础理科 7</h2>
+    <div class="gh">理科底座，覆盖数/理/光/声/电/材/热，承接硬件与算法底层问题</div>
+    <div class="grid">
+      <div class="card" data-cat="理科"><div class="en">Math</div><div class="nm">数学智能体</div><div class="rl">算法设计、数值优化、收益模型与统计推断。</div><div class="eco">对接：支撑全体系建模</div></div>
+      <div class="card" data-cat="理科"><div class="en">Physics</div><div class="nm">物理智能体</div><div class="rl">力学与运动学分析，设备动力学校验。</div><div class="eco">对接：康养机器人运动</div></div>
+      <div class="card" data-cat="理科"><div class="en">Optics</div><div class="nm">光学智能体</div><div class="rl">视觉成像与图像理解，海康摄像头 RTSP 接入。</div><div class="eco">对接：<b>sy</b> 流媒体 / 摄像头</div></div>
+      <div class="card" data-cat="理科"><div class="en">Sound</div><div class="nm">声学智能体</div><div class="rl">语音识别、降噪与声场分析。</div><div class="eco">对接：康养 / 客服语音</div></div>
+      <div class="card" data-cat="理科"><div class="en">Circuit</div><div class="nm">电路智能体</div><div class="rl">硬件电路设计与信号链路核查。</div><div class="eco">对接：售货机 / 控制器</div></div>
+      <div class="card" data-cat="理科"><div class="en">Material</div><div class="nm">材料智能体</div><div class="rl">选材与耐候性评估，降本选型。</div><div class="eco">对接：制造 / 外壳</div></div>
+      <div class="card" data-cat="理科"><div class="en">Thermal</div><div class="nm">热学智能体</div><div class="rl">散热与温控方案设计。</div><div class="eco">对接：设备散热</div></div>
+    </div>
+  </div>
+  <div class="group" data-cat="工程">
+    <h2>工程制造 2</h2>
+    <div class="gh">把理科结论落地为可制造的机械结构与可控的执行机构</div>
+    <div class="grid">
+      <div class="card" data-cat="工程"><div class="en">Mechanic</div><div class="nm">机械智能体</div><div class="rl">结构设计与传动机构，设备本体工程。</div><div class="eco">对接：售货机 / 机器人</div></div>
+      <div class="card" data-cat="工程"><div class="en">Control</div><div class="nm">控制智能体</div><div class="rl">运动控制与机器人 MQTT，对接 EMQX。</div><div class="eco">对接：<b>cj</b> EMQX 数据采集</div></div>
+    </div>
+  </div>
+  <div class="group" data-cat="软件">
+    <h2>软件信息 2</h2>
+    <div class="gh">代码与安全，撑起全栈开发与合规防护</div>
+    <div class="grid">
+      <div class="card" data-cat="软件"><div class="en">Code</div><div class="nm">代码智能体</div><div class="rl">系统开发、接口联调与自动化脚本。</div><div class="eco">对接：<b>jt/sj/tyb/yd</b> 全栈</div></div>
+      <div class="card" data-cat="软件"><div class="en">Safe</div><div class="nm">安全智能体</div><div class="rl">视频加密、人脸脱敏与合规防护。</div><div class="eco">对接：<b>sy</b> 流媒体 / 登登WiFi</div></div>
+    </div>
+  </div>
+  <div class="group" data-cat="业务">
+    <h2>业务特色 2</h2>
+    <div class="gh">贴合兴华自有零售与康养场景的专用智能体</div>
+    <div class="grid">
+      <div class="card" data-cat="业务"><div class="en">Retail</div><div class="nm">零售智能体</div><div class="rl">同重不同价中台与无人零售运营。</div><div class="eco">对接：<b>tyb</b> 挺盈宝 / <b>yd</b> 易得</div></div>
+      <div class="card" data-cat="业务"><div class="en">Health</div><div class="nm">康养智能体</div><div class="rl">康养机器人与健康服务场景。</div><div class="eco">对接：康养机器人 / 论坛</div></div>
+    </div>
+  </div>
+  </div>
+
+  <div class="sec-title">九大生态系统对接映射</div>
+  <div id="eco" class="eco-grid">
+    <div class="eco-card"><div class="host">tyb.ap100168.com:8006</div><div class="nm">挺盈宝无人商店</div><span class="tag">Retail + Code</span></div>
+    <div class="eco-card"><div class="host">yd.ap100168.com:8004</div><div class="nm">易得自动售货机</div><span class="tag">Retail + Circuit</span></div>
+    <div class="eco-card"><div class="host">登登WiFi</div><div class="nm">免费WiFi领取</div><span class="tag">Safe + Code</span></div>
+    <div class="eco-card"><div class="host">sy.ap100168.com:8007</div><div class="nm">流媒体平台</div><span class="tag">Optics + Safe</span></div>
+    <div class="eco-card"><div class="host">sj.ap100168.com</div><div class="nm">大屏数据平台</div><span class="tag">Code + Retail</span></div>
+    <div class="eco-card"><div class="host">cj.ap100168.com</div><div class="nm">EMQX数据采集</div><span class="tag">Control + Code</span></div>
+    <div class="eco-card"><div class="host">forum_hub</div><div class="nm">论坛社区</div><span class="tag">Retail + Health</span></div>
+    <div class="eco-card"><div class="host">jt.ap100168.com</div><div class="nm">落朵大脑(军团总部)</div><span class="tag">SkyDuo 总控 + 全Agent</span></div>
+    <div class="eco-card"><div class="host">康养机器人</div><div class="nm">康养服务终端</div><span class="tag">Health + Control + Physics</span></div>
+  </div>
+
+  <div class="foot">
+    数据来源：兴华AI军团 14智能体体系技能卡（xinghua-ai-army-14agents）。<br>
+    部署/更新走 deploy_14_agents.py；每日简报 daily_brief.py；成果落地 practice_endorse.py。<br>
+    白底黑字、近无彩、静态优先；点右上「更新」或打开页面即从 GitHub 仓库 <b>ai-army-matrix/data.js</b> 拉取最新名册（自动升级，无需手动改文件）。
+  </div>
+</div>
+
+<script>
+// 从本地数据文件重渲染（更新按钮用）
+function renderMatrix(){
+  var d = window.AI_ARMY; if(!d) return;
+  var m = document.getElementById('matrix'); m.innerHTML = '';
+  d.groups.forEach(function(g){
+    var grp = document.createElement('div'); grp.className='group'; grp.dataset.cat=g.key;
+    var h = document.createElement('h2'); h.textContent=g.title;
+    var gh = document.createElement('div'); gh.className='gh'; gh.textContent=g.desc;
+    var grid = document.createElement('div'); grid.className='grid';
+    d.agents.filter(function(a){return a.cat===g.key;}).forEach(function(a){
+      var c = document.createElement('div'); c.className='card'; c.dataset.cat=a.cat;
+      c.innerHTML = '<div class="en"></div><div class="nm"></div><div class="rl"></div><div class="eco"></div>';
+      c.querySelector('.en').textContent = a.en;
+      c.querySelector('.nm').textContent = a.nm;
+      c.querySelector('.rl').textContent = a.rl;
+      c.querySelector('.eco').innerHTML = '对接：' + a.eco;
+      grid.appendChild(c);
+    });
+    grp.appendChild(h); grp.appendChild(gh); grp.appendChild(grid); m.appendChild(grp);
+  });
+  var e = document.getElementById('eco'); e.innerHTML = '';
+  d.eco.forEach(function(x){
+    var c = document.createElement('div'); c.className='eco-card';
+    c.innerHTML = '<div class="host"></div><div class="nm"></div><span class="tag"></span>';
+    c.querySelector('.host').textContent = x.host;
+    c.querySelector('.nm').textContent = x.nm;
+    c.querySelector('.tag').textContent = x.tag;
+    e.appendChild(c);
+  });
+  var active = document.querySelector('#filters button.on');
+  var f = active ? active.dataset.f : 'all';
+  if(f!=='all'){ document.querySelectorAll('.group').forEach(function(gr){ gr.classList.toggle('hidden', gr.dataset.cat!==f); }); }
+}
+
+// 筛选（渐进增强，委托在 #filters 上，重渲染后仍有效）
+document.getElementById('filters').addEventListener('click', function(e){
+  var b = e.target.closest('button'); if(!b) return;
+  var f = b.dataset.f;
+  document.querySelectorAll('#filters button').forEach(function(x){ x.classList.remove('on'); });
+  b.classList.add('on');
+  document.querySelectorAll('.group').forEach(function(gr){
+    if(f==='all'){ gr.classList.remove('hidden'); }
+    else{ gr.classList.toggle('hidden', gr.dataset.cat!==f); }
+  });
+});
+
+// 远程数据源：GitHub 公开仓库 raw 地址（CORS 开放），点「更新」或页面加载即拉最新名册
+var REMOTE_DATA = 'https://raw.githubusercontent.com/linxingming168/luoduo-desktop/main/ai-army-matrix/data.js';
+function loadRemote(){
+  var btn = document.getElementById('updateBtn');
+  if(btn){ btn.disabled = true; btn.textContent = '更新中…'; }
+  var s = document.createElement('script');
+  s.src = REMOTE_DATA + '?t=' + Date.now();
+  s.onload = function(){
+    renderMatrix();
+    document.getElementById('stamp').textContent = '最后更新：' + new Date().toLocaleTimeString('zh-CN');
+    if(btn){ btn.disabled = false; btn.textContent = '更新'; }
+  };
+  s.onerror = function(){
+    document.getElementById('stamp').textContent = '未能从远程加载数据（检查网络 / 仓库可见性）';
+    if(btn){ btn.disabled = false; btn.textContent = '更新'; }
+  };
+  document.head.appendChild(s);
+}
+document.getElementById('updateBtn').addEventListener('click', loadRemote);
+// 页面加载即自动同步远程最新名册（白板自动升级）
+loadRemote();
+</script>
+</body>
+</html>
