@@ -4,12 +4,14 @@ import { api, ROSTER } from '../api/client';
 import type { Agent } from '../api/types';
 import ChatMessage from '../components/ChatMessage';
 import ChatInput from '../components/ChatInput';
+import ArtifactPanel from '../components/ArtifactPanel';
+import { extractArtifact } from '../utils/artifact';
+import type { Artifact } from '../utils/artifact';
 
 interface Msg {
   role: string;
   text: string;
-  artifact?: string;
-  downloadUrl?: string;
+  artifact?: Artifact;
 }
 
 export default function Chat({ initialAgent }: { initialAgent?: string }) {
@@ -18,6 +20,7 @@ export default function Chat({ initialAgent }: { initialAgent?: string }) {
   const [loading, setLoading] = useState(false);
   const [agentId, setAgentId] = useState<string | undefined>(initialAgent);
   const [agents, setAgents] = useState<Agent[]>([]);
+  const [activeArtifact, setActiveArtifact] = useState<Artifact | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // 载入智能体名册（来自后端 /api/health）
@@ -38,18 +41,23 @@ export default function Chat({ initialAgent }: { initialAgent?: string }) {
     if (!text || loading) return;
     setInput('');
     const agentLabel = agentId ? (ROSTER[agentId]?.label || agentId) : 'AI军团';
-    // 追加用户消息 + 一个空的助手占位（ loading 期间显示思考中）
     setMessages(prev => [...prev, { role: 'user', text }, { role: agentLabel, text: '' }]);
     setLoading(true);
     try {
       const reply = await api.chat(text, agentId);
+      const { text: cleanText, artifact } = extractArtifact(reply);
       setMessages(prev => {
         const next = [...prev];
         for (let i = next.length - 1; i >= 0; i--) {
-          if (next[i].role === agentLabel && next[i].text === '') { next[i] = { ...next[i], text: reply }; break; }
+          if (next[i].role === agentLabel && next[i].text === '') {
+            next[i] = { ...next[i], text: cleanText, artifact: artifact || undefined };
+            break;
+          }
         }
         return next;
       });
+      // HTML 类产物自动开右侧预览
+      if (artifact && artifact.type === 'html') setActiveArtifact(artifact);
     } catch (e: any) {
       const msg = e?.message || '请求失败，请检查后端连接';
       setMessages(prev => {
@@ -64,12 +72,12 @@ export default function Chat({ initialAgent }: { initialAgent?: string }) {
     }
   };
 
-  const startNew = () => { setMessages([]); setInput(''); setLoading(false); };
+  const startNew = () => { setMessages([]); setInput(''); setLoading(false); setActiveArtifact(null); };
 
   return (
     <div style={{ height: '100%', display: 'flex', fontFamily: 'sans-serif', background: '#ffffff', color: '#1a1a1a' }}>
       {/* Sidebar: 智能体列表 */}
-      <div style={{ width: 192, borderRight: '1px solid #ebebeb', background: '#fafafa', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ width: 192, borderRight: '1px solid #ebebeb', background: '#fafafa', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
         <div style={{ padding: 12, borderBottom: '1px solid #ebebeb' }}>
           <button onClick={startNew}
             style={{ width: '100%', padding: '8px 12px', background: '#1a1a1a', color: 'white', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 13 }}>
@@ -92,7 +100,7 @@ export default function Chat({ initialAgent }: { initialAgent?: string }) {
       </div>
 
       {/* Main */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'white' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'white', minWidth: 0 }}>
         {/* Header */}
         <div style={{ padding: '12px 16px', borderBottom: '1px solid #ebebeb', display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
           <Bot size={20} color="#1a1a1a" />
@@ -122,11 +130,17 @@ export default function Chat({ initialAgent }: { initialAgent?: string }) {
               <div style={{ textAlign: 'center' }}>
                 <MessageSquarePlus size={48} style={{ opacity: 0.5, margin: '0 auto 12px', display: 'block' }} />
                 <p style={{ fontSize: 14 }}>{agentId ? `与 ${ROSTER[agentId]?.label || agentId} 开始对话` : '选择一个智能体开始对话'}</p>
+                <p style={{ fontSize: 12, marginTop: 6, color: '#c0c0c0' }}>让我生成网页 / 小游戏，右侧会自动开预览面板</p>
               </div>
             </div>
           )}
           {messages.map((m, i) => (
-            <ChatMessage key={i} msg={m} streaming={loading && m.role !== 'user' && m.text === ''} />
+            <ChatMessage
+              key={i}
+              msg={m}
+              streaming={loading && m.role !== 'user' && m.text === ''}
+              onOpenArtifact={setActiveArtifact}
+            />
           ))}
         </div>
 
@@ -145,6 +159,11 @@ export default function Chat({ initialAgent }: { initialAgent?: string }) {
           />
         </div>
       </div>
+
+      {/* 右侧预览面板 */}
+      {activeArtifact && (
+        <ArtifactPanel artifact={activeArtifact} onClose={() => setActiveArtifact(null)} />
+      )}
     </div>
   );
 }
