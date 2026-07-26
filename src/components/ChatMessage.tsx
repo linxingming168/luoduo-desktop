@@ -45,12 +45,12 @@ export default function ChatMessage({ msg, streaming, onOpenArtifact }: Props) {
           <div className="mt-2 flex items-center gap-2 rounded-xl border border-[#ebebeb] bg-white px-3 py-2">
             <FileCode2 className="w-4 h-4 text-gray-700 flex-shrink-0" />
             <span className="text-xs text-gray-800 truncate flex-1" title={a.title}>{a.title}</span>
-            {a.type === 'html' && onOpenArtifact && (
+            {onOpenArtifact && (
               <button
                 onClick={() => onOpenArtifact(a)}
                 className="flex items-center gap-1 px-2 py-1 rounded-lg bg-gray-900 hover:bg-gray-800 text-white text-xs transition-colors flex-shrink-0"
               >
-                <Eye className="w-3 h-3" /> 预览
+                <Eye className="w-3 h-3" /> {a.type === 'html' ? '预览' : '查看'}
               </button>
             )}
             <button

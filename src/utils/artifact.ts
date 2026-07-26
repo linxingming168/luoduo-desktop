@@ -9,6 +9,10 @@ export interface Artifact {
 }
 
 const HTML_HINT = /<!doctype html|<html[\s>]/i;
+// HTML 片段特征：没有完整文档结构，但含可运行的标签组合
+const HTML_FRAGMENT_HINT = /<(canvas|div|body|style|script|svg|button|form|table)[\s>][\s\S]*<\/(canvas|div|body|style|script|svg|button|form|table)>/i;
+// 小于该长度的普通代码块不抽成产物（保留在正文里直接看）
+const MIN_CODE_ARTIFACT_LEN = 160;
 
 function guessTitle(lang: string, code: string, isHtml: boolean): string {
   if (isHtml) {
@@ -29,6 +33,13 @@ function guessTitle(lang: string, code: string, isHtml: boolean): string {
   return `代码.${ext}`;
 }
 
+function isHtmlLike(lang: string, code: string): boolean {
+  return lang === 'html' || HTML_HINT.test(code) || HTML_FRAGMENT_HINT.test(code);
+}
+
+const HTML_PLACEHOLDER = '📦 已生成可运行的网页/游戏 —— 右侧预览面板可直接玩，也可点「下载」保存文件。';
+const CODE_PLACEHOLDER = '📦 已生成代码 —— 见下方卡片，可查看源码或下载。';
+
 export function extractArtifact(reply: string): { text: string; artifact: Artifact | null } {
   if (!reply) return { text: reply, artifact: null };
 
@@ -40,14 +51,27 @@ export function extractArtifact(reply: string): { text: string; artifact: Artifa
     blocks.push({ lang: (m[1] || '').toLowerCase(), code: m[2].trim(), raw: m[0] });
   }
 
+  // 1b) 兜底：未闭合的围栏（回复被截断时 ```html 后面没有结尾 ```）
+  if (!blocks.length) {
+    const openFence = reply.match(/```([a-zA-Z0-9+#-]*)\r?\n([\s\S]{80,})$/);
+    if (openFence) {
+      blocks.push({ lang: (openFence[1] || '').toLowerCase(), code: openFence[2].trim(), raw: openFence[0] });
+    }
+  }
+
   if (blocks.length) {
-    // 挑选：优先带 html 语言标记或看起来像完整 HTML 的块；否则取第一个代码块
-    let chosen = blocks.find(b => b.lang === 'html' || HTML_HINT.test(b.code)) || blocks[0];
-    const isHtml = chosen.lang === 'html' || HTML_HINT.test(chosen.code);
-    const placeholder = isHtml
-      ? '📦 已生成可运行的网页/游戏 —— 点右侧「预览」即可直接玩，或点「下载」保存文件。'
-      : '📦 已生成代码 —— 见下方卡片，可查看源码或下载。';
-    const text = reply.replace(chosen.raw, placeholder).trim();
+    // 挑选：优先 HTML 类块（可直接运行）；否则取最长的代码块
+    const htmlBlock = blocks.find(b => isHtmlLike(b.lang, b.code));
+    const longest = blocks.reduce((a, b) => (b.code.length > a.code.length ? b : a), blocks[0]);
+    const chosen = htmlBlock || longest;
+    const isHtml = isHtmlLike(chosen.lang, chosen.code);
+
+    // 非 HTML 且太短的代码块：不抽产物，正文原样保留
+    if (!isHtml && chosen.code.length < MIN_CODE_ARTIFACT_LEN) {
+      return { text: reply, artifact: null };
+    }
+
+    const text = reply.replace(chosen.raw, isHtml ? HTML_PLACEHOLDER : CODE_PLACEHOLDER).trim();
     return {
       text,
       artifact: {
@@ -63,7 +87,7 @@ export function extractArtifact(reply: string): { text: string; artifact: Artifa
   const bare = reply.match(/<!doctype html[\s\S]*?<\/html>/i) || reply.match(/<html[\s\S]*?<\/html>/i);
   if (bare) {
     const code = bare[0];
-    const text = reply.replace(code, '📦 已生成可运行的网页/游戏 —— 点右侧「预览」即可直接玩，或点「下载」保存文件。').trim();
+    const text = reply.replace(code, HTML_PLACEHOLDER).trim();
     return {
       text,
       artifact: { type: 'html', lang: 'html', code, title: guessTitle('html', code, true) },
@@ -71,6 +95,21 @@ export function extractArtifact(reply: string): { text: string; artifact: Artifa
   }
 
   return { text: reply, artifact: null };
+}
+
+// 预览用：HTML 片段（无完整文档结构）自动包壳，避免 iframe 白屏
+export function buildPreviewDoc(a: Artifact): string {
+  if (a.type !== 'html') return a.code;
+  if (HTML_HINT.test(a.code)) return a.code; // 已是完整文档
+  return [
+    '<!DOCTYPE html>',
+    '<html lang="zh-CN"><head><meta charset="UTF-8">',
+    '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
+    '<style>body{margin:0;background:#fff;color:#1a1a1a;font-family:system-ui,sans-serif;}</style>',
+    '</head><body>',
+    a.code,
+    '</body></html>',
+  ].join('\n');
 }
 
 // 浏览器/Electron 渲染进程通用的 Blob 下载
@@ -85,4 +124,26 @@ export function downloadArtifact(a: Artifact): void {
   link.click();
   document.body.removeChild(link);
   setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+// 复制代码到剪贴板（带降级方案）
+export async function copyArtifactCode(a: Artifact): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(a.code);
+    return true;
+  } catch {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = a.code;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      return ok;
+    } catch {
+      return false;
+    }
+  }
 }
