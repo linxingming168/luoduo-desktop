@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getServerUrl, setServerUrl, getApiKey, setApiKey } from '../api/client';
-import { Settings as SettingsIcon, Globe, Moon, Sun, Info, Save, KeyRound, AlertTriangle } from 'lucide-react';
+import { Settings as SettingsIcon, Globe, Moon, Sun, Info, Save, KeyRound, AlertTriangle, RefreshCw } from 'lucide-react';
 import { useServerHealth } from '../hooks/useServerHealth';
 
 export default function Settings() {
@@ -12,6 +12,8 @@ export default function Settings() {
   const [darkMode, setDarkMode] = useState(
     document.documentElement.classList.contains('dark')
   );
+  const [updateChecking, setUpdateChecking] = useState(false);
+  const [updateResult, setUpdateResult] = useState('');
 
   // 从 Electron 主进程读取版本号
   useEffect(() => {
@@ -34,6 +36,33 @@ export default function Settings() {
     const next = !darkMode;
     setDarkMode(next);
     document.documentElement.classList.toggle('dark', next);
+  };
+
+  const handleCheckUpdate = async () => {
+    setUpdateChecking(true);
+    setUpdateResult('');
+    const api = (window as any).electronAPI;
+    if (!api?.checkForUpdates) {
+      setUpdateResult('Web 版不支持检查更新（请在桌面客户端使用）');
+      setUpdateChecking(false);
+      return;
+    }
+    try {
+      const result = await api.checkForUpdates();
+      if (result.ok && result.version) {
+        if (result.version !== appVersion) {
+          setUpdateResult(`发现新版本 v${result.version}，正在后台自动下载…`);
+        } else {
+          setUpdateResult(`当前已是最新版本 v${appVersion}`);
+        }
+      } else {
+        setUpdateResult('当前已是最新版本');
+      }
+    } catch (e: any) {
+      setUpdateResult('检查更新失败：' + (e.message || '未知错误'));
+    } finally {
+      setUpdateChecking(false);
+    }
   };
 
   return (
@@ -133,6 +162,16 @@ export default function Settings() {
             <p className="pt-2 text-xs text-gray-400 dark:text-gray-500">
               基于 Electron + React 构建。连接到 AI 军团大脑服务器使用。
             </p>
+          </div>
+          <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+            <button onClick={handleCheckUpdate} disabled={updateChecking}
+              className="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center gap-1.5 disabled:opacity-50">
+              <RefreshCw className={`w-3 h-3 ${updateChecking ? 'animate-spin' : ''}`} />
+              {updateChecking ? '检查中…' : '检查更新'}
+            </button>
+            {updateResult && (
+              <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">{updateResult}</p>
+            )}
           </div>
         </div>
       </div>
