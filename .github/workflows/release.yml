@@ -1,6 +1,6 @@
 name: Release
 
-# 打 tag（如 v2.1.17）推送到 main 即自动构建并发布 GitHub Release。
+# 打 tag（如 v2.1.29）推送到 main 即自动构建 Windows 安装包并发布 GitHub Release。
 # 已安装的客户端会通过 electron-updater 自动检测并静默更新（main.ts 已接好）。
 on:
   push:
@@ -30,7 +30,18 @@ jobs:
       - name: Build web + electron main
         run: npm run build
 
+      # 只打包安装包，不内置发布（避免 electron-builder 直连 GitHub 发布接口在网络抖动时静默失败）
+      - name: Build installer (no publish)
+        run: npx electron-builder --win --publish never
+
+      # 用成熟 action 显式上传并发布，抗网络抖动更稳
       - name: Publish to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: false
+          files: |
+            dist/*.exe
+            dist/*.yml
+            dist/*.blockmap
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx electron-builder --publish always
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
