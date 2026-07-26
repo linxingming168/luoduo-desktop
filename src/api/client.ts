@@ -137,7 +137,12 @@ export const api = {
     payload: { instruction: string },
     signal?: AbortSignal,
   ): Promise<ExecuteResponse> => {
-    const { data } = await createClient().post(`/api/agent/${agentId}/execute`, payload, { signal });
+    // 长任务（子智能体 / skydo 采集等）易超 60s 全局上限被 axios 掐断；
+    // 放宽到 5 分钟，并保留 signal 让用户可主动取消。真正的根治见 async+taskId 轮询方案。
+    const { data } = await createClient().post(`/api/agent/${agentId}/execute`, payload, {
+      signal,
+      timeout: 300000,
+    });
     return data;
   },
 
@@ -146,7 +151,8 @@ export const api = {
     if (agentId) body.agent = agentId;
     // 后端 /api/chat 原生支持 images（dataURL/base64/URL 列表），走视觉模型
     if (images && images.length) body.images = images;
-    const { data } = await createClient().post('/api/chat', body, { timeout: 180000 });
+    // 长推理 / 长代码生成可能超过 3 分钟，放宽到 5 分钟，与 executeAgent 拉齐
+    const { data } = await createClient().post('/api/chat', body, { timeout: 300000 });
     return data.reply || data.response || JSON.stringify(data);
   },
 
