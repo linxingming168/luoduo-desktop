@@ -50,7 +50,7 @@ function WorkflowNodeComponent({ data, selected }: NodeProps<any>) {
   const cfg = nodeTypeConfigs[data.type] || { label: data.type, color: '#6b7280', icon: Bot };
   const Icon = cfg.icon;
   return (
-    <div className={`relative px-4 py-3 rounded-xl border-2 min-w-[160px] transition-shadow ${selected ? 'shadow-lg ring-2 ring-blue-400' : 'shadow-sm'}`}
+    <div className={`relative px-4 py-3 rounded-xl border-2 min-w-[160px] transition-shadow ${selected ? 'shadow-lg ring-2 ring-gray-400' : 'shadow-sm'}`}
       style={{ borderColor: cfg.color, background: `${cfg.color}11` }}>
       <Handle type="target" position={Position.Left} className="!w-3 !h-3 !border-2 !border-white" style={{ background: cfg.color }} />
       <div className="flex items-center gap-2">
@@ -108,7 +108,7 @@ function ConfigPanel({ node, onUpdate, onDelete }: { node: any; onUpdate: (d: No
     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100">{cfg.label} 配置</h3>
-        <button onClick={onDelete} className="p-1 rounded hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500"><Trash2 className="w-4 h-4" /></button>
+        <button onClick={onDelete} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-900/30 text-gray-500"><Trash2 className="w-4 h-4" /></button>
       </div>
       <div className="mb-2"><label className="block text-xs text-gray-500 mb-1">节点标签</label>{input('label', '可选标识')}</div>
 
@@ -128,8 +128,8 @@ function ConfigPanel({ node, onUpdate, onDelete }: { node: any; onUpdate: (d: No
       {data.type === 'condition' && (<>
         <div className="mb-2"><label className="block text-xs text-gray-500 mb-1">条件表达式</label>{textarea('expression', 2)}
         <div className="flex gap-2 mt-1">
-          <span className="text-[10px] px-2 py-0.5 rounded bg-green-100 text-green-700">✅ 是 → 上端口</span>
-          <span className="text-[10px] px-2 py-0.5 rounded bg-red-100 text-red-700">❌ 否 → 下端口</span>
+          <span className="text-[10px] px-2 py-0.5 rounded bg-gray-100 text-gray-700">✅ 是 → 上端口</span>
+          <span className="text-[10px] px-2 py-0.5 rounded bg-gray-100 text-gray-700">❌ 否 → 下端口</span>
         </div></div>
       </>)}
       {data.type === 'agent' && (<>
@@ -264,7 +264,7 @@ export default function WorkflowEditor() {
         const ed = await er.json();
         setExecResult(ed.data || ed);
         const executedIds = new Set(Object.keys(ed.data?.node_results || {}));
-        setNodes(nds => nds.map(n => ({ ...n, className: executedIds.has(n.id) ? '!ring-2 !ring-green-400' : '' })));
+        setNodes(nds => nds.map(n => ({ ...n, className: executedIds.has(n.id) ? '!ring-2 !ring-gray-400' : '' })));
       }
     } catch (err: any) { setExecResult({ error: err.message }); }
     setExecuting(false);
@@ -284,18 +284,18 @@ export default function WorkflowEditor() {
     <div className="h-full flex">
       <div className="w-12 flex-shrink-0 bg-gray-100 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col items-center py-2 gap-2">
         <button onClick={() => setShowPalette(!showPalette)}
-          className={`p-2 rounded-lg ${showPalette ? 'bg-blue-100 text-blue-600' : 'text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700'}`} title="节点">
+          className={`p-2 rounded-lg ${showPalette ? 'bg-gray-100 text-gray-600' : 'text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-800'}`} title="节点">
           <Plus className="w-5 h-5" />
         </button>
-        <button onClick={save} className={`p-2 rounded-lg ${!saved ? 'text-amber-500' : 'text-gray-500'} hover:bg-gray-200 dark:hover:bg-gray-700`} title="保存">
+        <button onClick={save} className={`p-2 rounded-lg ${!saved ? 'text-gray-500' : 'text-gray-500'} hover:bg-gray-200 dark:hover:bg-gray-800`} title="保存">
           <Save className="w-5 h-5" />
         </button>
         <button onClick={execute} disabled={executing}
-          className="p-2 rounded-lg text-green-600 hover:bg-green-100 dark:hover:bg-green-900/30 disabled:opacity-50" title="执行">
+          className="p-2 rounded-lg text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-900/30 disabled:opacity-50" title="执行">
           {executing ? <Loader2 className="w-5 h-5 animate-spin" /> : <Play className="w-5 h-5" />}
         </button>
         <div className="flex-1" />
-        <button onClick={() => { setNodes([]); setEdges([]); }} className="p-2 rounded-lg text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30" title="清空">
+        <button onClick={() => { setNodes([]); setEdges([]); }} className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-900/30" title="清空">
           <Trash2 className="w-4 h-4" />
         </button>
       </div>
@@ -309,7 +309,7 @@ export default function WorkflowEditor() {
               {items.map((item: any) => (
                 <div key={item.type} draggable
                   onDragStart={(e) => { e.dataTransfer.setData('application/reactflow', item.type); e.dataTransfer.effectAllowed = 'move'; }}
-                  className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-grab active:cursor-grabbing mb-1">
+                  className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-grab active:cursor-grabbing mb-1">
                   <div className="w-5 h-5 rounded flex items-center justify-center" style={{ background: item.color }}>
                     <item.icon className="w-3 h-3 text-white" />
                   </div>
@@ -327,7 +327,7 @@ export default function WorkflowEditor() {
             className="text-sm font-bold bg-transparent text-gray-900 dark:text-gray-100 border-none outline-none flex-1" placeholder="工作流名称" />
           <input value={wfDesc} onChange={e => { setWfDesc(e.target.value); setSaved(false); }}
             className="text-xs text-gray-500 bg-transparent border-none outline-none flex-1 max-w-xs" placeholder="描述" />
-          {!saved && <span className="text-[10px] text-amber-500">未保存</span>}
+          {!saved && <span className="text-[10px] text-gray-500">未保存</span>}
         </div>
         <div className="flex-1">
           <ReactFlow<any>

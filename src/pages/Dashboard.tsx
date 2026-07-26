@@ -41,8 +41,8 @@ export default function Dashboard({ onChat }: Props) {
           )}
           <div className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full ${
             online
-              ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400'
-              : 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400'
+              ? 'bg-gray-50 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400'
+              : 'bg-gray-50 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400'
           }`}>
             <Activity className="w-3 h-3" />
             {online ? '在线' : '离线'}
@@ -58,7 +58,7 @@ export default function Dashboard({ onChat }: Props) {
           placeholder="搜索智能体..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent text-sm"
         />
       </div>
 

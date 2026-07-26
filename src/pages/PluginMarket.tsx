@@ -14,13 +14,13 @@ interface Plugin {
 }
 
 const tagColors: Record<string, string> = {
-  '搜索': 'bg-blue-100 text-blue-700', '信息': 'bg-cyan-100 text-cyan-700',
-  '开发': 'bg-green-100 text-green-700', '工具': 'bg-gray-100 text-gray-700',
-  '图像': 'bg-purple-100 text-purple-700', '创作': 'bg-pink-100 text-pink-700',
-  '音频': 'bg-indigo-100 text-indigo-700', '集成': 'bg-amber-100 text-amber-700',
-  '通知': 'bg-orange-100 text-orange-700', '网络': 'bg-teal-100 text-teal-700',
-  '自动化': 'bg-rose-100 text-rose-700', '工作流': 'bg-violet-100 text-violet-700',
-  '测试': 'bg-lime-100 text-lime-700',
+  '搜索': 'bg-gray-100 text-gray-700', '信息': 'bg-gray-100 text-gray-700',
+  '开发': 'bg-gray-100 text-gray-700', '工具': 'bg-gray-100 text-gray-700',
+  '图像': 'bg-gray-100 text-gray-700', '创作': 'bg-gray-100 text-gray-700',
+  '音频': 'bg-gray-100 text-gray-700', '集成': 'bg-gray-100 text-gray-700',
+  '通知': 'bg-gray-100 text-gray-700', '网络': 'bg-gray-100 text-gray-700',
+  '自动化': 'bg-gray-100 text-gray-700', '工作流': 'bg-gray-100 text-gray-700',
+  '测试': 'bg-gray-100 text-gray-700',
 };
 
 export default function PluginMarket() {
@@ -67,7 +67,7 @@ export default function PluginMarket() {
   return (
     <div className="p-6 max-w-5xl mx-auto">
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-500 to-gray-500 flex items-center justify-center">
           <Puzzle className="w-5 h-5 text-white" />
         </div>
         <div className="flex-1">
@@ -75,7 +75,7 @@ export default function PluginMarket() {
           <p className="text-sm text-gray-500 dark:text-gray-400">{plugins.length} 个插件 · 支持第三方开发者接入</p>
         </div>
         <button onClick={() => setShowInstall(!showInstall)}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl text-sm font-medium shadow-lg">
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-gray-500 to-gray-500 text-white rounded-xl text-sm font-medium shadow-lg">
           <Plus className="w-4 h-4" /> 注册插件
         </button>
       </div>
@@ -96,7 +96,7 @@ export default function PluginMarket() {
             rows={8} className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-xs font-mono bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 resize-none" />
           <div className="flex justify-end gap-2 mt-2">
             <button onClick={() => setShowInstall(false)} className="px-3 py-1.5 text-sm text-gray-500">取消</button>
-            <button onClick={installPlugin} className="px-4 py-1.5 text-sm bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg font-medium">注册</button>
+            <button onClick={installPlugin} className="px-4 py-1.5 text-sm bg-gradient-to-r from-gray-500 to-gray-500 text-white rounded-lg font-medium">注册</button>
           </div>
         </div>
       )}
@@ -111,7 +111,7 @@ export default function PluginMarket() {
                   <h3 className="font-semibold text-sm text-gray-900 dark:text-gray-100">{p.name}</h3>
                   <span className="text-[10px] text-gray-400">v{p.version}</span>
                   {p.author === 'AI军团' && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-700">官方</span>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-700">官方</span>
                   )}
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{p.description}</p>
@@ -123,7 +123,7 @@ export default function PluginMarket() {
                 </div>
               </div>
               <button onClick={() => togglePlugin(p.id, p.enabled)}
-                className={`flex-shrink-0 p-1.5 rounded-lg transition-colors ${p.enabled ? 'text-green-500 hover:bg-green-50 dark:hover:bg-green-900/30' : 'text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>
+                className={`flex-shrink-0 p-1.5 rounded-lg transition-colors ${p.enabled ? 'text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-900/30' : 'text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'}`}>
                 {p.enabled ? <ToggleRight className="w-5 h-5" /> : <ToggleLeft className="w-5 h-5" />}
               </button>
             </div>

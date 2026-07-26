@@ -51,7 +51,7 @@ export default function Knowledge() {
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <div className="flex items-center gap-3 mb-6">
-        <BookOpen className="w-6 h-6 text-blue-500" />
+        <BookOpen className="w-6 h-6 text-gray-500" />
         <div>
           <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">知识库</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">大脑已掌握的知识</p>
@@ -65,12 +65,12 @@ export default function Knowledge() {
           placeholder="搜索知识..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent text-sm"
         />
       </div>
 
       {error && (
-        <div className="mb-4 p-4 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-sm text-amber-800 dark:text-amber-200">
+        <div className="mb-4 p-4 rounded-xl bg-gray-50 dark:bg-gray-950/40 border border-gray-200 dark:border-gray-800 text-sm text-gray-800 dark:text-gray-200">
           <p className="font-medium">无法加载知识库</p>
           <p className="mt-1 text-xs opacity-80">
             {error.status === 401 || error.status === 403

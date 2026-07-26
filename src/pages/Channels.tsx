@@ -38,7 +38,7 @@ export function APIKeysPage() {
   return (
     <div className="p-6 max-w-3xl mx-auto">
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-500 to-gray-500 flex items-center justify-center">
           <Key className="w-5 h-5 text-white" />
         </div>
         <div>
@@ -48,12 +48,12 @@ export function APIKeysPage() {
       </div>
 
       {newKey && (
-        <div className="mb-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl">
-          <p className="text-sm font-medium text-green-800 dark:text-green-300 mb-2">🎉 新密钥已生成（请立即复制，不会再次显示）</p>
+        <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 rounded-xl">
+          <p className="text-sm font-medium text-gray-800 dark:text-gray-300 mb-2">🎉 新密钥已生成（请立即复制，不会再次显示）</p>
           <div className="flex gap-2">
-            <code className="flex-1 px-3 py-2 bg-white dark:bg-gray-900 border border-green-200 dark:border-green-700 rounded-lg text-xs font-mono break-all">{newKey}</code>
+            <code className="flex-1 px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-xs font-mono break-all">{newKey}</code>
             <button onClick={() => { navigator.clipboard.writeText(newKey); setCopied('new'); }}
-              className="px-3 py-2 bg-green-500 text-white rounded-lg text-xs hover:bg-green-600">
+              className="px-3 py-2 bg-gray-900 text-white rounded-lg text-xs hover:bg-gray-800">
               {copied === 'new' ? '已复制' : '复制'}
             </button>
           </div>
@@ -65,7 +65,7 @@ export function APIKeysPage() {
           className="flex-1 px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
           placeholder="应用名称（如：我的博客）" />
         <button onClick={generate}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl text-sm font-medium shadow-lg">
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-gray-500 to-gray-500 text-white rounded-xl text-sm font-medium shadow-lg">
           <Plus className="w-4 h-4" /> 生成密钥
         </button>
       </div>
@@ -77,11 +77,11 @@ export function APIKeysPage() {
               <span className="font-medium text-sm text-gray-900 dark:text-gray-100">{k.name}</span>
               <div className="flex gap-1">
                 <button onClick={() => { navigator.clipboard.writeText(k.key); setCopied(k.key); }}
-                  className="p-1.5 rounded text-gray-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30">
-                  {copied === k.key ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                  className="p-1.5 rounded text-gray-400 hover:text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-900/30">
+                  {copied === k.key ? <Check className="w-4 h-4 text-gray-500" /> : <Copy className="w-4 h-4" />}
                 </button>
                 <button onClick={() => revoke(k.key)}
-                  className="p-1.5 rounded text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30">
+                  className="p-1.5 rounded text-gray-400 hover:text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-900/30">
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
@@ -123,7 +123,7 @@ export function PublishChannelsPage() {
   return (
     <div className="p-6 max-w-5xl mx-auto">
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-teal-500 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-500 to-gray-500 flex items-center justify-center">
           <Smartphone className="w-5 h-5 text-white" />
         </div>
         <div>
@@ -138,7 +138,7 @@ export function PublishChannelsPage() {
           return (
             <div key={ch.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-5">
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-green-500 to-teal-500 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-gray-500 to-gray-500 flex items-center justify-center">
                   <Icon className="w-4 h-4 text-white" />
                 </div>
                 <div>
@@ -161,7 +161,7 @@ export function PublishChannelsPage() {
           <code className="text-xs text-gray-600 dark:text-gray-400 break-all">{embedCode}</code>
         </div>
         <button onClick={() => navigator.clipboard.writeText(embedCode)}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-xl text-sm font-medium">
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-gray-500 to-gray-500 text-white rounded-xl text-sm font-medium">
           <Copy className="w-4 h-4" /> 复制嵌入代码
         </button>
       </div>

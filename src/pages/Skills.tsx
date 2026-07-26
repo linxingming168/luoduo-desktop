@@ -131,7 +131,7 @@ export default function Skills() {
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <div className="flex items-center gap-3 mb-6">
-        <Wrench className="w-6 h-6 text-emerald-500" />
+        <Wrench className="w-6 h-6 text-gray-500" />
         <div>
           <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">技能库</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">AI 军团掌握的全部技能（按分类）</p>
@@ -145,14 +145,14 @@ export default function Skills() {
           placeholder="搜索技能..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent text-sm"
         />
       </div>
 
       {/* 工具条：勾选筛选 + 锁定 */}
       <div className="flex flex-wrap items-center gap-2 mb-4">
         <span className="text-xs text-gray-500 dark:text-gray-400">
-          已启用 <b className="text-emerald-600 dark:text-emerald-400">{selected.size}</b> / 共 {skills.length}
+          已启用 <b className="text-gray-600 dark:text-gray-400">{selected.size}</b> / 共 {skills.length}
         </span>
         <button
           onClick={selectAll}
@@ -172,7 +172,7 @@ export default function Skills() {
           onClick={() => setOnlyEnabled(v => !v)}
           className={`text-xs px-2.5 py-1 rounded-lg border ${
             onlyEnabled
-              ? 'border-emerald-400 text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20'
+              ? 'border-gray-400 text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/20'
               : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300'
           }`}
         >
@@ -182,7 +182,7 @@ export default function Skills() {
           onClick={() => setLocked(v => !v)}
           className={`ml-auto flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg border ${
             locked
-              ? 'border-amber-400 text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20'
+              ? 'border-gray-400 text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/20'
               : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300'
           }`}
           title="锁定后不允许随意调整，需先解锁"
@@ -193,7 +193,7 @@ export default function Skills() {
       </div>
 
       {error && (
-        <div className="mb-4 p-4 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-sm text-amber-800 dark:text-amber-200">
+        <div className="mb-4 p-4 rounded-xl bg-gray-50 dark:bg-gray-950/40 border border-gray-200 dark:border-gray-800 text-sm text-gray-800 dark:text-gray-200">
           <p className="font-medium">无法加载技能库</p>
           <p className="mt-1 text-xs opacity-80">
             {error.status === 401 || error.status === 403
@@ -229,12 +229,12 @@ export default function Skills() {
                     title="整类启用/停用"
                   >
                     {allOn ? (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                      <CheckCircle2 className="w-4 h-4 text-gray-500" />
                     ) : (
                       <Circle className="w-4 h-4 text-gray-300 dark:text-gray-600" />
                     )}
                   </button>
-                  <Folder className="w-4 h-4 text-emerald-500" />
+                  <Folder className="w-4 h-4 text-gray-500" />
                   <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-200">{cat}</h2>
                   <span className="text-xs text-gray-400">{items.length}</span>
                 </div>
@@ -245,7 +245,7 @@ export default function Skills() {
                       <div
                         key={skill.id}
                         className={`bg-white dark:bg-gray-800 border rounded-xl overflow-hidden ${
-                          on ? 'border-emerald-300 dark:border-emerald-700' : 'border-gray-200 dark:border-gray-700'
+                          on ? 'border-gray-300 dark:border-gray-700' : 'border-gray-200 dark:border-gray-700'
                         }`}
                       >
                         <div className="flex items-center gap-2 px-4 py-3">
@@ -254,7 +254,7 @@ export default function Skills() {
                             checked={on}
                             disabled={locked}
                             onChange={() => toggle(skill.id)}
-                            className="w-4 h-4 accent-emerald-500 flex-shrink-0"
+                            className="w-4 h-4 accent-gray-500 flex-shrink-0"
                           />
                           <button
                             onClick={() => setExpanded(expanded === String(skill.id) ? null : String(skill.id))}

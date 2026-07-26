@@ -10,7 +10,7 @@ export default function Automation() {
   return (
     <div className="p-6 max-w-5xl mx-auto">
       <div className="flex items-center gap-3 mb-6">
-        <Zap className="w-6 h-6 text-amber-500" />
+        <Zap className="w-6 h-6 text-gray-500" />
         <div>
           <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">自动化</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">自动化规则 · 定时任务 · 事件驱动</p>
@@ -24,7 +24,7 @@ export default function Automation() {
           <div className="text-xs text-gray-500 mt-1">总规则</div>
         </div>
         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-          <div className="text-2xl font-bold text-green-600">{triggers.filter(t => t.status === '运行中').length}</div>
+          <div className="text-2xl font-bold text-gray-600">{triggers.filter(t => t.status === '运行中').length}</div>
           <div className="text-xs text-gray-500 mt-1">运行中</div>
         </div>
         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
@@ -37,7 +37,7 @@ export default function Automation() {
       <div className="space-y-3">
         {triggers.map(t => (
           <div key={t.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 flex items-center gap-4">
-            <div className={`w-2 h-2 rounded-full flex-shrink-0 ${t.status === '运行中' ? 'bg-green-500' : 'bg-gray-300'}`} />
+            <div className={`w-2 h-2 rounded-full flex-shrink-0 ${t.status === '运行中' ? 'bg-gray-500' : 'bg-gray-300'}`} />
             <div className="flex-1 min-w-0">
               <div className="font-medium text-gray-900 dark:text-gray-100 text-sm">{t.name}</div>
               <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
@@ -46,7 +46,7 @@ export default function Automation() {
               </div>
             </div>
             <span className={`text-xs px-2 py-0.5 rounded-full ${
-              t.status === '运行中' ? 'bg-green-100 text-green-700 dark:bg-green-900/30' : 'bg-gray-100 text-gray-500 dark:bg-gray-700'
+              t.status === '运行中' ? 'bg-gray-100 text-gray-700 dark:bg-gray-900/30' : 'bg-gray-100 text-gray-500 dark:bg-gray-700'
             }`}>{t.status}</span>
           </div>
         ))}

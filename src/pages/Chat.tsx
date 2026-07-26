@@ -67,12 +67,12 @@ export default function Chat({ initialAgent }: { initialAgent?: string }) {
   const startNew = () => { setMessages([]); setInput(''); setLoading(false); };
 
   return (
-    <div style={{ height: '100%', display: 'flex', fontFamily: 'sans-serif', background: '#f9fafb', color: '#111' }}>
+    <div style={{ height: '100%', display: 'flex', fontFamily: 'sans-serif', background: '#ffffff', color: '#1a1a1a' }}>
       {/* Sidebar: 智能体列表 */}
-      <div style={{ width: 192, borderRight: '1px solid #e5e7eb', background: '#f9fafb', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ padding: 12, borderBottom: '1px solid #e5e7eb' }}>
+      <div style={{ width: 192, borderRight: '1px solid #ebebeb', background: '#fafafa', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: 12, borderBottom: '1px solid #ebebeb' }}>
           <button onClick={startNew}
-            style={{ width: '100%', padding: '8px 12px', background: '#3b82f6', color: 'white', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 13 }}>
+            style={{ width: '100%', padding: '8px 12px', background: '#1a1a1a', color: 'white', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 13 }}>
             <Plus size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} />新对话
           </button>
         </div>
@@ -83,8 +83,8 @@ export default function Chat({ initialAgent }: { initialAgent?: string }) {
           {agents.map(a => (
             <button key={a.id} onClick={() => setAgentId(a.id)}
               style={{ width: '100%', textAlign: 'left', padding: '8px 10px', marginBottom: 4, borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 13,
-                background: agentId === a.id ? '#e0edff' : 'transparent',
-                color: agentId === a.id ? '#1d4ed8' : '#374151' }}>
+                background: agentId === a.id ? '#f1f1f1' : 'transparent',
+                color: agentId === a.id ? '#1a1a1a' : '#4b5563' }}>
               <span style={{ marginRight: 6 }}>{a.emoji}</span>{a.label}
             </button>
           ))}
@@ -94,22 +94,22 @@ export default function Chat({ initialAgent }: { initialAgent?: string }) {
       {/* Main */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'white' }}>
         {/* Header */}
-        <div style={{ padding: '12px 16px', borderBottom: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
-          <Bot size={20} color="#3b82f6" />
+        <div style={{ padding: '12px 16px', borderBottom: '1px solid #ebebeb', display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+          <Bot size={20} color="#1a1a1a" />
           <span style={{ fontWeight: 600, fontSize: 14 }}>对话</span>
           <span style={{ fontSize: 12, color: '#9ca3af' }}>
             {agentId ? `· ${ROSTER[agentId]?.label || agentId}` : '· 自由对话'}
           </span>
           <div style={{ flex: 1 }} />
-          <div style={{ display: 'flex', background: '#f3f4f6', borderRadius: 8, padding: 2 }}>
+          <div style={{ display: 'flex', background: '#f5f5f5', borderRadius: 8, padding: 2 }}>
             <button onClick={() => setAgentId(undefined)}
               style={{ padding: '4px 12px', borderRadius: 6, fontSize: 12, border: 'none', cursor: 'pointer',
-                background: !agentId ? 'white' : 'transparent', color: !agentId ? '#3b82f6' : '#6b7280' }}>
+                background: !agentId ? 'white' : 'transparent', color: !agentId ? '#1a1a1a' : '#6b7280' }}>
               <BrainCircuit size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} />自由对话
             </button>
             <button onClick={() => {}}
               style={{ padding: '4px 12px', borderRadius: 6, fontSize: 12, border: 'none', cursor: 'pointer',
-                background: agentId ? 'white' : 'transparent', color: agentId ? '#3b82f6' : '#6b7280' }}>
+                background: agentId ? 'white' : 'transparent', color: agentId ? '#1a1a1a' : '#6b7280' }}>
               <Navigation size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} />指定智能体
             </button>
           </div>
@@ -131,7 +131,7 @@ export default function Chat({ initialAgent }: { initialAgent?: string }) {
         </div>
 
         {/* Input */}
-        <div style={{ borderTop: '1px solid #e5e7eb', flexShrink: 0 }}>
+        <div style={{ borderTop: '1px solid #ebebeb', flexShrink: 0 }}>
           <ChatInput
             value={input}
             onChange={setInput}

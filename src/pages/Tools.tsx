@@ -34,16 +34,16 @@ const toolLabels: Record<string, string> = {
 };
 
 const toolColors: Record<string, string> = {
-  code_execute: 'from-green-500 to-emerald-600',
-  web_search: 'from-blue-500 to-indigo-600',
-  http_request: 'from-purple-500 to-violet-600',
-  document_read: 'from-amber-500 to-orange-600',
-  webhook_send: 'from-pink-500 to-rose-600',
-  web_fetch: 'from-cyan-500 to-teal-600',
-  image_generate: 'from-rose-500 to-pink-600',
-  ocr: 'from-violet-500 to-purple-600',
-  tts: 'from-sky-500 to-blue-600',
-  asr: 'from-lime-500 to-green-600',
+  code_execute: 'from-gray-500 to-gray-600',
+  web_search: 'from-gray-500 to-gray-600',
+  http_request: 'from-gray-500 to-gray-600',
+  document_read: 'from-gray-500 to-gray-600',
+  webhook_send: 'from-gray-500 to-gray-600',
+  web_fetch: 'from-gray-500 to-gray-600',
+  image_generate: 'from-gray-500 to-gray-600',
+  ocr: 'from-gray-500 to-gray-600',
+  tts: 'from-gray-500 to-gray-600',
+  asr: 'from-gray-500 to-gray-600',
 };
 
 const defaultParams: Record<string, any> = {
@@ -115,7 +115,7 @@ export default function Tools() {
     <div className="p-6 max-w-5xl mx-auto">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-500 to-gray-600 flex items-center justify-center">
           <Wrench className="w-5 h-5 text-white" />
         </div>
         <div>
@@ -125,7 +125,7 @@ export default function Tools() {
       </div>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400">
+        <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 rounded-lg text-sm text-gray-600 dark:text-gray-400">
           {error}
         </div>
       )}
@@ -252,7 +252,7 @@ export default function Tools() {
 
               {/* Execute Button */}
               <button onClick={execute} disabled={loading}
-                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl text-sm font-medium hover:from-green-600 hover:to-emerald-700 disabled:opacity-50 transition-all shadow-lg">
+                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl text-sm font-medium hover:from-gray-600 hover:to-gray-700 disabled:opacity-50 transition-all shadow-lg">
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
                 {loading ? '执行中...' : '执行'}
               </button>
@@ -262,11 +262,11 @@ export default function Tools() {
                 <div className="mt-4">
                   <div className="flex items-center gap-2 mb-2">
                     {result.ok ? (
-                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <CheckCircle className="w-4 h-4 text-gray-500" />
                     ) : (
-                      <XCircle className="w-4 h-4 text-red-500" />
+                      <XCircle className="w-4 h-4 text-gray-500" />
                     )}
-                    <span className={`text-xs font-medium ${result.ok ? 'text-green-600' : 'text-red-600'}`}>
+                    <span className={`text-xs font-medium ${result.ok ? 'text-gray-600' : 'text-gray-600'}`}>
                       {result.ok ? '执行成功' : '执行失败'}
                     </span>
                     {result._elapsed && (

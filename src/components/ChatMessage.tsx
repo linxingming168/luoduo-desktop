@@ -14,8 +14,8 @@ export default function ChatMessage({ msg, streaming, onPreview }: Props) {
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>
       <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${
         isUser
-          ? 'bg-blue-500 text-white rounded-br-md'
-          : 'bg-gray-100 dark:bg-gray-700/50 text-gray-900 dark:text-gray-100 rounded-bl-md'
+          ? 'bg-gray-900 text-white rounded-br-md'
+          : 'bg-gray-100 text-gray-900 rounded-bl-md'
       }`}>
         {/* Agent name badge */}
         {!isUser && msg.role && (
@@ -28,7 +28,7 @@ export default function ChatMessage({ msg, streaming, onPreview }: Props) {
         <div className="text-sm whitespace-pre-wrap break-words leading-relaxed">
           {msg.text}
           {isStreaming && (
-            <span className="inline-block w-1.5 h-4 bg-blue-500 ml-0.5 animate-pulse rounded-sm" />
+            <span className="inline-block w-1.5 h-4 bg-gray-900 ml-0.5 animate-pulse rounded-sm" />
           )}
         </div>
 

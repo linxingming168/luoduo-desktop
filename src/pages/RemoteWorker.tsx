@@ -55,7 +55,7 @@ export default function RemoteWorkerPage() {
     <div className="p-6 max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <Radio className="w-6 h-6 text-green-500" />
+          <Radio className="w-6 h-6 text-gray-500" />
           <div>
             <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">远程助手</h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">在外地远程操控办公室电脑</p>
@@ -64,7 +64,7 @@ export default function RemoteWorkerPage() {
       </div>
 
       {!isElectron && (
-        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-700">
+        <div className="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-700">
           远程助手需要在桌面客户端（Electron）中运行。请下载桌面端。
         </div>
       )}
@@ -74,12 +74,12 @@ export default function RemoteWorkerPage() {
         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">🔄 Worker 状态</h2>
-            <span className={`text-xs px-2.5 py-1 rounded-full ${active ? 'bg-green-100 text-green-700 dark:bg-green-900/30' : 'bg-gray-100 text-gray-500 dark:bg-gray-700'}`}>
+            <span className={`text-xs px-2.5 py-1 rounded-full ${active ? 'bg-gray-100 text-gray-700 dark:bg-gray-900/30' : 'bg-gray-100 text-gray-500 dark:bg-gray-700'}`}>
               {active ? '运行中' : '已停止'}
             </span>
           </div>
           <div className="flex items-center gap-3 mb-4">
-            {active ? <Wifi className="w-8 h-8 text-green-500" /> : <WifiOff className="w-8 h-8 text-gray-400" />}
+            {active ? <Wifi className="w-8 h-8 text-gray-500" /> : <WifiOff className="w-8 h-8 text-gray-400" />}
             <div className="text-sm text-gray-500 dark:text-gray-400">
               {active
                 ? '后台每 5 秒轮询一次任务队列，自动领取执行'
@@ -89,8 +89,8 @@ export default function RemoteWorkerPage() {
           <button onClick={toggleWorker} disabled={!isElectron}
             className={`w-full py-3 rounded-xl text-white text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
               active
-                ? 'bg-red-500 hover:bg-red-600'
-                : 'bg-green-500 hover:bg-green-600 disabled:bg-gray-300'
+                ? 'bg-gray-900 hover:bg-gray-800'
+                : 'bg-gray-900 hover:bg-gray-900 disabled:bg-gray-300'
             }`}>
             {active ? <><PowerOff className="w-4 h-4" /> 停止远程Worker</> : <><Power className="w-4 h-4" /> 启动远程Worker</>}
           </button>
@@ -101,11 +101,11 @@ export default function RemoteWorkerPage() {
           <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">📊 任务队列</h2>
           <div className="flex gap-6">
             <div className="text-center">
-              <div className="text-3xl font-bold text-amber-500">{tasks.pending}</div>
+              <div className="text-3xl font-bold text-gray-500">{tasks.pending}</div>
               <div className="text-xs text-gray-500 mt-1">待处理</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-green-500">{tasks.completed}</div>
+              <div className="text-3xl font-bold text-gray-500">{tasks.completed}</div>
               <div className="text-xs text-gray-500 mt-1">已完成</div>
             </div>
           </div>
@@ -118,7 +118,7 @@ export default function RemoteWorkerPage() {
       {/* 使用说明 */}
       <div className="mt-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-5">
         <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
-          <List className="w-4 h-4 text-blue-500" /> 使用流程
+          <List className="w-4 h-4 text-gray-500" /> 使用流程
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
           {[
@@ -144,7 +144,7 @@ export default function RemoteWorkerPage() {
             {history.map((h, i) => (
               <div key={i} className="p-2 bg-gray-50 dark:bg-gray-900 rounded-lg text-xs">
                 <div className="flex items-center gap-2">
-                  {h.ok ? <CheckCircle className="w-3 h-3 text-green-500" /> : <AlertTriangle className="w-3 h-3 text-red-500" />}
+                  {h.ok ? <CheckCircle className="w-3 h-3 text-gray-500" /> : <AlertTriangle className="w-3 h-3 text-gray-500" />}
                   <span className="text-gray-500">{h.completed_at}</span>
                 </div>
                 {h.stdout && <pre className="mt-1 text-gray-600 dark:text-gray-400 truncate">{h.stdout.slice(0, 200)}</pre>}

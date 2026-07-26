@@ -95,7 +95,7 @@ export default function TaskHall() {
   return (
     <div className="p-6 max-w-6xl mx-auto">
       <div className="flex items-center gap-3 mb-6">
-        <Target className="w-6 h-6 text-rose-500" />
+        <Target className="w-6 h-6 text-gray-500" />
         <div>
           <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">任务大厅</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -110,7 +110,7 @@ export default function TaskHall() {
           {/* 自动分派 */}
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-5">
             <div className="flex items-center gap-2 mb-3">
-              <Bot className="w-4 h-4 text-blue-500" />
+              <Bot className="w-4 h-4 text-gray-500" />
               <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">🤖 智能分派</h2>
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
@@ -121,12 +121,12 @@ export default function TaskHall() {
               onChange={e => setTask(e.target.value)}
               placeholder='例如："我想做大亚湾新零售市场调研和成本预算"'
               rows={4}
-              className="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              className="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 resize-none"
             />
             <button
               onClick={handleAutoDispatch}
               disabled={!task.trim() || loading}
-              className="mt-3 px-5 py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white text-sm transition-colors flex items-center gap-2"
+              className="mt-3 px-5 py-2.5 rounded-xl bg-gray-900 hover:bg-gray-900 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white text-sm transition-colors flex items-center gap-2"
             >
               {loading ? (
                 <span className="flex gap-1">
@@ -143,13 +143,13 @@ export default function TaskHall() {
           {dispatchAgents.length > 0 && (
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-5">
               <div className="flex items-center gap-2 mb-3">
-                <UserCheck className="w-4 h-4 text-emerald-500" />
+                <UserCheck className="w-4 h-4 text-gray-500" />
                 <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">活跃智能体</h2>
                 <span className="text-xs text-gray-400 ml-1">{enabled.size}/{dispatchAgents.length}</span>
                 <button
                   onClick={() => setLocked(v => !v)}
                   className={`ml-auto flex items-center gap-1 text-xs px-2 py-1 rounded-lg border ${
-                    locked ? 'border-amber-400 text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20' : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300'
+                    locked ? 'border-gray-400 text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/20' : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300'
                   }`}
                 >
                   {locked ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
@@ -158,7 +158,7 @@ export default function TaskHall() {
               </div>
               <p className="text-xs text-gray-400 mb-2">勾选的智能体才参与分派，省去不相关的技能阅读与算力</p>
               {enabled.size > 0 && enabled.size < dispatchAgents.length && (
-                <p className="text-xs text-amber-500 mb-2">⚠️ 已启用 {enabled.size}/{dispatchAgents.length} 个智能体，未启用的不参与本次派发</p>
+                <p className="text-xs text-gray-500 mb-2">⚠️ 已启用 {enabled.size}/{dispatchAgents.length} 个智能体，未启用的不参与本次派发</p>
               )}
               <div className="max-h-48 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 gap-1.5">
                 {dispatchAgents.map(a => {
@@ -166,8 +166,8 @@ export default function TaskHall() {
                   return (
                     <label key={a.id} className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs cursor-pointer transition-colors ${
                       locked ? 'opacity-60' : 'hover:bg-gray-50 dark:hover:bg-gray-800'
-                    } ${on ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300' : 'text-gray-500 dark:text-gray-400'}`}>
-                      <input type="checkbox" checked={on} disabled={locked} onChange={() => toggleAgent(a.id)} className="w-3 h-3 accent-emerald-500" />
+                    } ${on ? 'bg-gray-50 dark:bg-gray-900/20 text-gray-700 dark:text-gray-300' : 'text-gray-500 dark:text-gray-400'}`}>
+                      <input type="checkbox" checked={on} disabled={locked} onChange={() => toggleAgent(a.id)} className="w-3 h-3 accent-gray-500" />
                       <span className="truncate">{a.label || a.id}</span>
                     </label>
                   );
@@ -180,11 +180,11 @@ export default function TaskHall() {
           {result && (
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-5">
               <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-500" />
+                <CheckCircle className="w-4 h-4 text-gray-500" />
                 执行结果
               </h2>
               {result.error ? (
-                <div className="text-sm text-red-500 flex items-center gap-2">
+                <div className="text-sm text-gray-500 flex items-center gap-2">
                   <AlertCircle className="w-4 h-4" />
                   {result.error}
                 </div>
@@ -197,7 +197,7 @@ export default function TaskHall() {
                       </div>
                       <div className="flex flex-wrap gap-2">
                         {result.steps.map((s: any, i: number) => (
-                          <span key={i} className="text-xs px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                          <span key={i} className="text-xs px-2.5 py-1 rounded-full bg-gray-50 dark:bg-gray-900/20 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-800">
                             {s.agent || s.general || '?'}
                           </span>
                         ))}
@@ -211,9 +211,9 @@ export default function TaskHall() {
                           {r.agent}
                         </span>
                         {r.ok ? (
-                          <span className="text-xs text-green-500 flex items-center gap-1"><CheckCircle className="w-3 h-3" /> 完成</span>
+                          <span className="text-xs text-gray-500 flex items-center gap-1"><CheckCircle className="w-3 h-3" /> 完成</span>
                         ) : (
-                          <span className="text-xs text-red-500 flex items-center gap-1"><AlertCircle className="w-3 h-3" /> 异常</span>
+                          <span className="text-xs text-gray-500 flex items-center gap-1"><AlertCircle className="w-3 h-3" /> 异常</span>
                         )}
                       </div>
                       <div className="text-sm text-gray-600 dark:text-gray-400 markdown-body whitespace-pre-wrap line-clamp-4">
@@ -237,7 +237,7 @@ export default function TaskHall() {
         <div className="space-y-4">
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-5">
             <div className="flex items-center gap-2 mb-3">
-              <Users className="w-4 h-4 text-purple-500" />
+              <Users className="w-4 h-4 text-gray-500" />
               <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">👤 手动选人</h2>
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
@@ -250,7 +250,7 @@ export default function TaskHall() {
                   onClick={() => setSelectedAgent(a.id)}
                   className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-colors ${
                     selectedAgent === a.id
-                      ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 font-medium'
+                      ? 'bg-gray-100 dark:bg-gray-900/30 text-gray-700 dark:text-gray-300 font-medium'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
                   }`}
                 >
@@ -269,12 +269,12 @@ export default function TaskHall() {
                   onChange={e => setManualInput(e.target.value)}
                   placeholder={`向 ${agents.find(a => a.id === selectedAgent)?.label || selectedAgent} 提问...`}
                   rows={3}
-                  className="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                  className="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 resize-none"
                 />
                 <button
                   onClick={handleManualChat}
                   disabled={!manualInput.trim()}
-                  className="mt-2 w-full px-4 py-2 rounded-xl bg-purple-500 hover:bg-purple-600 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white text-sm transition-colors"
+                  className="mt-2 w-full px-4 py-2 rounded-xl bg-gray-900 hover:bg-gray-900 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white text-sm transition-colors"
                 >
                   指派任务
                 </button>

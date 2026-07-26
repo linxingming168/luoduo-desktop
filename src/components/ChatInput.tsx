@@ -29,14 +29,14 @@ export default function ChatInput({ value, onChange, onSend, onStop, onFile, onD
       <div className="flex items-center gap-1.5">
         {/* Voice */}
         <button onClick={onVoice}
-          className="p-2 rounded-lg text-gray-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
+          className="p-2 rounded-lg text-gray-400 hover:text-gray-900 hover:bg-gray-100 transition-colors"
           title="语音输入">
           <Mic className="w-4 h-4" />
         </button>
 
         {/* File */}
         <button onClick={() => fileRef.current?.click()}
-          className="p-2 rounded-lg text-gray-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
+          className="p-2 rounded-lg text-gray-400 hover:text-gray-900 hover:bg-gray-100 transition-colors"
           title="上传文件">
           <Paperclip className="w-4 h-4" />
         </button>
@@ -44,7 +44,7 @@ export default function ChatInput({ value, onChange, onSend, onStop, onFile, onD
 
         {/* Folder */}
         <button onClick={() => dirRef.current?.click()}
-          className="p-2 rounded-lg text-gray-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
+          className="p-2 rounded-lg text-gray-400 hover:text-gray-900 hover:bg-gray-100 transition-colors"
           title="上传文件夹">
           <Folder className="w-4 h-4" />
         </button>
@@ -56,19 +56,19 @@ export default function ChatInput({ value, onChange, onSend, onStop, onFile, onD
           onChange={e => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder || "输入消息..."}
-          className="flex-1 px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-full text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="flex-1 px-4 py-2 border border-gray-200 rounded-full text-sm bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400"
         />
 
         {/* Send / Stop */}
         {loading ? (
           <button onClick={onStop}
-            className="p-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors"
+            className="p-2 rounded-lg bg-gray-900 text-white hover:bg-gray-800 transition-colors"
             title="停止">
             <Square className="w-4 h-4" />
           </button>
         ) : (
           <button onClick={onSend} disabled={!value.trim()}
-            className="p-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="p-2 rounded-lg bg-gray-900 text-white hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             title="发送">
             <Send className="w-4 h-4" />
           </button>

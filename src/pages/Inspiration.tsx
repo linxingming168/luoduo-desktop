@@ -32,16 +32,16 @@ export default function Inspiration() {
 
   const statusColor = (s: string) => {
     switch (s) {
-      case '已采纳': return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
-      case '开发中': return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400';
-      default: return 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400';
+      case '已采纳': return 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400';
+      case '开发中': return 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400';
+      default: return 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400';
     }
   };
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-500 to-gray-500 flex items-center justify-center">
           <Lightbulb className="w-5 h-5 text-white" />
         </div>
         <div className="flex-1">
@@ -49,7 +49,7 @@ export default function Inspiration() {
           <p className="text-sm text-gray-500 dark:text-gray-400">你的每一个想法，都可能成为下一个功能</p>
         </div>
         <button onClick={() => setShowSubmit(!showSubmit)}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl text-sm font-medium hover:from-purple-600 hover:to-pink-600 transition-all shadow-lg shadow-purple-500/20">
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-gray-500 to-gray-500 text-white rounded-xl text-sm font-medium hover:from-gray-600 hover:to-gray-600 transition-all shadow-lg shadow-gray-500/20">
           <Plus className="w-4 h-4" /> 提交灵感
         </button>
       </div>
@@ -59,13 +59,13 @@ export default function Inspiration() {
           <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">💡 新灵感</h3>
           <input value={newTitle} onChange={e => setNewTitle(e.target.value)}
             placeholder="给你的灵感取个标题..."
-            className="w-full px-3 py-2 mb-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+            className="w-full px-3 py-2 mb-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500" />
           <textarea value={newDesc} onChange={e => setNewDesc(e.target.value)}
             rows={3} placeholder="详细描述你的想法..."
-            className="w-full px-3 py-2 mb-3 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none" />
+            className="w-full px-3 py-2 mb-3 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 resize-none" />
           <div className="flex justify-end gap-2">
             <button onClick={() => setShowSubmit(false)} className="px-3 py-1.5 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">取消</button>
-            <button className="px-4 py-1.5 text-sm bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-medium hover:from-purple-600 hover:to-pink-600">提交</button>
+            <button className="px-4 py-1.5 text-sm bg-gradient-to-r from-gray-500 to-gray-500 text-white rounded-lg font-medium hover:from-gray-600 hover:to-gray-600">提交</button>
           </div>
         </div>
       )}
@@ -74,7 +74,7 @@ export default function Inspiration() {
         {categories.map(c => (
           <button key={c} onClick={() => setCategory(c)}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-              category === c ? 'bg-purple-500 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+              category === c ? 'bg-gray-900 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800'
             }`}>{c}</button>
         ))}
       </div>
@@ -84,7 +84,7 @@ export default function Inspiration() {
           <div key={idea.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 hover:shadow-md transition-shadow">
             <div className="flex items-start gap-3">
               <div className="flex flex-col items-center gap-0.5 min-w-[40px]">
-                <button className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-purple-500 transition-colors">
+                <button className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 hover:text-gray-500 transition-colors">
                   <ThumbsUp className="w-4 h-4" />
                 </button>
                 <span className="text-xs font-bold text-gray-600 dark:text-gray-400">{idea.votes}</span>
