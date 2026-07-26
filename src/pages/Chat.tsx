@@ -7,6 +7,8 @@ import ChatInput from '../components/ChatInput';
 import ArtifactPanel from '../components/ArtifactPanel';
 import { extractArtifact } from '../utils/artifact';
 import type { Artifact } from '../utils/artifact';
+import { readFiles, buildAttachmentText, formatSize } from '../utils/attachments';
+import type { Attachment } from '../utils/attachments';
 
 interface Msg {
   role: string;
@@ -21,7 +23,23 @@ export default function Chat({ initialAgent }: { initialAgent?: string }) {
   const [agentId, setAgentId] = useState<string | undefined>(initialAgent);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [activeArtifact, setActiveArtifact] = useState<Artifact | null>(null);
+  // 🔒 附件链路（2026-07-26 修复：原 onFile/onDir 是空壳，选了文件毫无反应）
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const [attachNote, setAttachNote] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // 选文件/文件夹 → 解析为附件并显示附件条
+  const handlePick = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    const { attachments: atts, skipped } = await readFiles(files);
+    setAttachments(prev => [...prev, ...atts]);
+    setAttachNote(skipped.length ? `已跳过：${skipped.join('、')}` : '');
+    e.target.value = ''; // 允许重复选同一文件
+  };
+
+  const removeAttachment = (idx: number) => {
+    setAttachments(prev => prev.filter((_, i) => i !== idx));
+  };
 
   // 载入智能体名册（来自后端 /api/health）
   useEffect(() => {
@@ -38,13 +56,23 @@ export default function Chat({ initialAgent }: { initialAgent?: string }) {
 
   const send = async () => {
     const text = input.trim();
-    if (!text || loading) return;
+    if ((!text && attachments.length === 0) || loading) return;
     setInput('');
     const agentLabel = agentId ? (ROSTER[agentId]?.label || agentId) : 'AI军团';
-    setMessages(prev => [...prev, { role: 'user', text }, { role: agentLabel, text: '' }]);
+    // 组装：文本附件拼进消息，图片附件走 images 字段
+    const atts = attachments;
+    setAttachments([]);
+    setAttachNote('');
+    const attText = buildAttachmentText(atts);
+    const images = atts.filter(a => a.kind === 'image').map(a => a.content);
+    const fullMessage = (text || '请分析这些附件') + attText;
+    const shownText = atts.length
+      ? (text || '请分析这些附件') + '\n📎 ' + atts.map(a => a.name).join('、')
+      : text;
+    setMessages(prev => [...prev, { role: 'user', text: shownText }, { role: agentLabel, text: '' }]);
     setLoading(true);
     try {
-      const reply = await api.chat(text, agentId);
+      const reply = await api.chat(fullMessage, agentId, images.length ? images : undefined);
       const { text: cleanText, artifact } = extractArtifact(reply);
       setMessages(prev => {
         const next = [...prev];
@@ -72,7 +100,7 @@ export default function Chat({ initialAgent }: { initialAgent?: string }) {
     }
   };
 
-  const startNew = () => { setMessages([]); setInput(''); setLoading(false); setActiveArtifact(null); };
+  const startNew = () => { setMessages([]); setInput(''); setLoading(false); setActiveArtifact(null); setAttachments([]); setAttachNote(''); };
 
   return (
     <div style={{ height: '100%', display: 'flex', fontFamily: 'sans-serif', background: '#ffffff', color: '#1a1a1a' }}>
@@ -144,6 +172,25 @@ export default function Chat({ initialAgent }: { initialAgent?: string }) {
           ))}
         </div>
 
+        {/* 附件条：选中的文件在这里显示，可单个移除 */}
+        {(attachments.length > 0 || attachNote) && (
+          <div style={{ padding: '8px 16px', borderTop: '1px solid #ebebeb', background: '#fafafa', flexShrink: 0 }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+              {attachments.map((a, i) => (
+                <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 10px',
+                  background: 'white', border: '1px solid #ebebeb', borderRadius: 8, fontSize: 12, color: '#1a1a1a' }}>
+                  {a.kind === 'image' ? '🖼' : '📄'} {a.name}
+                  <span style={{ color: '#9ca3af' }}>{formatSize(a.size)}</span>
+                  <button onClick={() => removeAttachment(i)}
+                    style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#9ca3af', padding: 0, fontSize: 13, lineHeight: 1 }}
+                    title="移除">×</button>
+                </span>
+              ))}
+            </div>
+            {attachNote && <div style={{ marginTop: 4, fontSize: 11, color: '#9ca3af' }}>{attachNote}</div>}
+          </div>
+        )}
+
         {/* Input */}
         <div style={{ borderTop: '1px solid #ebebeb', flexShrink: 0 }}>
           <ChatInput
@@ -151,8 +198,8 @@ export default function Chat({ initialAgent }: { initialAgent?: string }) {
             onChange={setInput}
             onSend={send}
             onStop={() => setLoading(false)}
-            onFile={() => {}}
-            onDir={() => {}}
+            onFile={handlePick}
+            onDir={handlePick}
             onVoice={() => {}}
             loading={loading}
             placeholder={agentId ? `对 ${ROSTER[agentId]?.label || agentId} 说点什么…` : '自由对话...'}

@@ -141,10 +141,12 @@ export const api = {
     return data;
   },
 
-  chat: async (message: string, agentId?: string): Promise<string> => {
-    const body: Record<string, string> = { message };
+  chat: async (message: string, agentId?: string, images?: string[]): Promise<string> => {
+    const body: Record<string, unknown> = { message };
     if (agentId) body.agent = agentId;
-    const { data } = await createClient().post('/api/chat', body);
+    // 后端 /api/chat 原生支持 images（dataURL/base64/URL 列表），走视觉模型
+    if (images && images.length) body.images = images;
+    const { data } = await createClient().post('/api/chat', body, { timeout: 180000 });
     return data.reply || data.response || JSON.stringify(data);
   },
 
