@@ -21,8 +21,11 @@ export function setApiKey(key: string): void {
   localStorage.setItem(KEY_KEY, key.trim());
 }
 
-// 军团花名册：id -> { label, role, emoji }（按落朵大脑 jt_health 运行态 18 位）
-export const ROSTER: Record<string, { label: string; role: string; emoji: string }> = {
+// 军团花名册：id -> { label, role, emoji, skills }
+// 🔒 固化名册（2026-07-27）：所有智能体必须在此有清晰名称+角色+技能标识。
+// 服务器 /api/health 现已返回 agents_detail（名称+技能，由 AGENTS 单一来源派生），
+// 客户端优先用服务器数据；本 ROSTER 仅作离线兜底，新增/更名务必同步双方，勿回退成裸 id。
+export const ROSTER: Record<string, { label: string; role: string; emoji: string; skills?: string[] }> = {
   zhuge: { label: '诸葛亮', role: 'CEO 总战略', emoji: '🧠' },
   fanli: { label: '范蠡', role: '产品规划', emoji: '📦' },
   hekun: { label: '和珅', role: '财务', emoji: '💰' },
@@ -37,10 +40,11 @@ export const ROSTER: Record<string, { label: string; role: string; emoji: string
   cailun: { label: '蔡伦', role: '内容创作', emoji: '✍️' },
   shenkuo: { label: '沈括', role: '科技综合', emoji: '🔬' },
   mozi: { label: '墨子', role: '工程逻辑', emoji: '📐' },
-  id374: { label: 'id374', role: '扩展入驻位', emoji: '🤖' },
-  id375: { label: 'id375', role: '扩展入驻位', emoji: '🤖' },
-  id411: { label: 'id411', role: '扩展入驻位', emoji: '🤖' },
-  id412: { label: 'id412', role: '扩展入驻位', emoji: '🤖' },
+  bixin: { label: '笔芯秘书', role: '首席知识官·归档与技能管家', emoji: '📝', skills: ['归档整理', '技能提取', '知识管理', '备注记录', '信息归档'] },
+  id374: { label: '阿前', role: '前端交互工程师', emoji: '🎨', skills: ['前端开发', 'React/Vue/TS', '小程序开发', 'UI组件', '前端测试'] },
+  id375: { label: '阿后', role: '后端逻辑工程师', emoji: '⚙️', skills: ['后端开发', 'Python/FastAPI', 'REST API', 'DB设计', '后端测试'] },
+  id411: { label: '阿运', role: 'DevOps集成工程师', emoji: '🚀', skills: ['DevOps', 'Docker', 'CI/CD', 'Nginx配置', '部署脚本'] },
+  id412: { label: '阿嵌', role: '嵌入式固件工程师', emoji: '🔧', skills: ['嵌入式开发', 'C/RTOS', 'STM32', '固件开发', '驱动开发'] },
 };
 
 export function decorateAgent(id: string): Agent {
@@ -50,6 +54,7 @@ export function decorateAgent(id: string): Agent {
     label: m?.label || id,
     role: m?.role || '智能体',
     emoji: m?.emoji || '🤖',
+    skills: m?.skills || [],
     doc_type: '',
   };
 }
@@ -120,11 +125,24 @@ async function getList(
 }
 
 export const api = {
-  // 智能体名册走公开的 /api/health（免密钥），按花名册装饰；
-  // 原 /api/agents 需密钥会 401，故不以它为准。
+  // 智能体名册走公开的 /api/health（免密钥）。
+  // 🔒 固化：优先用服务器 agents_detail（名称+角色+技能，由 AGENTS 单一来源派生），
+  // 升级不会丢失；仅当服务器未返回 agents_detail 时回退到本地 ROSTER 装饰裸 id。
   getAgents: async (): Promise<AgentResponse> => {
     try {
       const { data } = await createClient().get('/api/health');
+      const detail = Array.isArray(data?.agents_detail) ? data.agents_detail : [];
+      if (detail.length > 0) {
+        const agents: Agent[] = detail.map((a: any) => ({
+          id: a.id,
+          label: a.name || a.id,
+          role: a.role || '智能体',
+          emoji: a.emoji || '🤖',
+          skills: Array.isArray(a.skills) ? a.skills : [],
+          doc_type: '',
+        }));
+        return { agents, count: agents.length };
+      }
       const ids: string[] = Array.isArray(data?.agents) ? data.agents : [];
       return { agents: ids.map(decorateAgent), count: ids.length };
     } catch {

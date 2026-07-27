@@ -341,8 +341,14 @@ export default function Chat({ initialAgent }: { initialAgent?: string }) {
             <button key={a.id} onClick={() => { setAgentId(a.id); markAgent(a.id); }}
               style={{ width: '100%', textAlign: 'left', padding: '8px 10px', marginBottom: 4, borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 13,
                 background: agentId === a.id ? '#ececec' : 'transparent',
-                color: agentId === a.id ? '#1a1a1a' : '#4b5563' }}>
-              <span style={{ marginRight: 6 }}>{a.emoji}</span>{a.label}
+                color: agentId === a.id ? '#1a1a1a' : '#4b5563', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ marginRight: 2 }}>{a.emoji}</span>
+              <span style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                <span style={{ fontSize: 13, lineHeight: 1.3 }}>{a.label}</span>
+                <span style={{ fontSize: 10, color: '#9ca3af', lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {a.role}{a.skills && a.skills.length > 0 ? ' · ' + a.skills.join('/') : ''}
+                </span>
+              </span>
             </button>
           ))}
         </div>

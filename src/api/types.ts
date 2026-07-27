@@ -4,6 +4,7 @@ export interface Agent {
   doc_type?: string;
   role?: string;
   emoji?: string;
+  skills?: string[];
 }
 
 export interface AgentResponse {
