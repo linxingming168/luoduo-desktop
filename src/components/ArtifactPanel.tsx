@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { X, Download, Eye, Code2, RefreshCw, Copy, Check } from 'lucide-react';
+import { X, Download, Eye, Code2, RefreshCw, Copy, Check, Maximize2 } from 'lucide-react';
 import type { Artifact } from '../utils/artifact';
 import { downloadArtifact, buildPreviewDoc, copyArtifactCode } from '../utils/artifact';
 
@@ -14,11 +14,25 @@ const btnStyle: React.CSSProperties = {
   display: 'inline-flex', alignItems: 'center',
 };
 
-// 右侧预览面板：HTML 直接在 iframe 里运行（可玩游戏）；音频直接内嵌播放器；也可看源码 / 复制 / 下载
+// 右侧预览面板：HTML 直接在 iframe 里运行（可玩游戏）；音频直接内嵌播放器；视频专属原生播放器（进度条/全屏/下载）；也可看源码 / 复制 / 下载
 // 支持左边缘拖拽调宽、Esc 关闭
 export default function ArtifactPanel({ artifact, onClose }: Props) {
   const isAudio = artifact.type === 'audio';
-  const canPreview = artifact.type === 'html' || isAudio;
+  // 视频识别：后端 html artifact 含 <video> 标签，或 url/code 指向视频文件（type 联合类型不含 'video'，按内容启发式识别）
+  const isVideo =
+    /<video[\s>]/i.test(artifact.code || '') ||
+    /\.(mp4|webm|mov|m3u8)(\?|$)/i.test(artifact.url || '') ||
+    /\.(mp4|webm|mov|m3u8)(\?|$)/i.test(artifact.code || '');
+  const videoSrc = (() => {
+    if (artifact.url && /\.(mp4|webm|mov|m3u8)(\?|$)/i.test(artifact.url)) return artifact.url;
+    const m1 = (artifact.code || '').match(/<video[^>]*src=["']([^"']+)["']/i);
+    if (m1) return m1[1];
+    const m2 = (artifact.code || '').match(/(https?:\/\/[^\s"'<>]+\.(?:mp4|webm|mov|m3u8))/i);
+    if (m2) return m2[1];
+    return artifact.url || '';
+  })();
+  const showVideo = isVideo && !!videoSrc;
+  const canPreview = artifact.type === 'html' || isAudio || isVideo;
   const [tab, setTab] = useState<'preview' | 'code'>(canPreview ? 'preview' : 'code');
   const [reloadKey, setReloadKey] = useState(0);
   const [copied, setCopied] = useState(false);
@@ -27,6 +41,7 @@ export default function ArtifactPanel({ artifact, onClose }: Props) {
     return saved >= 360 && saved <= 1000 ? saved : 520;
   });
   const dragging = useRef(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   // 切换到不同产物时重置标签页并重跑
   useEffect(() => {
@@ -72,6 +87,20 @@ export default function ArtifactPanel({ artifact, onClose }: Props) {
     if (ok) { setCopied(true); setTimeout(() => setCopied(false), 1500); }
   };
 
+  const doFullscreen = () => {
+    const v = videoRef.current;
+    if (v) { if (v.requestFullscreen) v.requestFullscreen().catch(() => {}); }
+  };
+
+  const downloadVideo = (url: string) => {
+    try {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = (artifact.title || 'video') + '.mp4';
+      document.body.appendChild(a); a.click(); a.remove();
+    } catch { /* 跨域受限时忽略 */ }
+  };
+
   return (
     <div style={{
       width, minWidth: 360, maxWidth: 1000, position: 'relative',
@@ -92,8 +121,8 @@ export default function ArtifactPanel({ artifact, onClose }: Props) {
           {artifact.title}
         </span>
 
-        {/* 预览 / 源码 切换（音频无源码，不显示） */}
-        {!isAudio && (
+        {/* 预览 / 源码 切换（音频、视频无源码切换，不显示） */}
+        {!isAudio && !showVideo && (
           <div style={{ display: 'flex', background: '#f5f5f5', borderRadius: 8, padding: 2, marginLeft: 4 }}>
             {canPreview && (
               <button onClick={() => setTab('preview')}
@@ -112,7 +141,13 @@ export default function ArtifactPanel({ artifact, onClose }: Props) {
 
         <div style={{ flex: 1 }} />
 
-        {artifact.type === 'html' && tab === 'preview' && (
+        {/* 视频：全屏按钮 */}
+        {showVideo && (
+          <button onClick={doFullscreen} title="全屏播放" style={btnStyle}>
+            <Maximize2 size={14} />
+          </button>
+        )}
+        {artifact.type === 'html' && tab === 'preview' && !showVideo && (
           <button onClick={() => setReloadKey(k => k + 1)} title="重新运行" style={btnStyle}>
             <RefreshCw size={14} />
           </button>
@@ -120,7 +155,7 @@ export default function ArtifactPanel({ artifact, onClose }: Props) {
         <button onClick={doCopy} title={copied ? '已复制' : (isAudio ? '复制链接' : '复制代码')} style={{ ...btnStyle, color: copied ? '#1a1a1a' : '#4b5563' }}>
           {copied ? <Check size={14} /> : <Copy size={14} />}
         </button>
-        <button onClick={() => downloadArtifact(artifact)} title="下载" style={btnStyle}>
+        <button onClick={() => showVideo ? downloadVideo(videoSrc) : downloadArtifact(artifact)} title="下载" style={btnStyle}>
           <Download size={14} />
         </button>
         <button onClick={onClose} title="关闭预览（Esc）" style={btnStyle}>
@@ -136,6 +171,15 @@ export default function ArtifactPanel({ artifact, onClose }: Props) {
             <audio controls autoPlay src={artifact.url} style={{ width: '100%' }} />
             <div style={{ fontSize: 12, color: '#9ca3af', borderTop: '1px solid #ebebeb', paddingTop: 12 }}>
               开放 / 合规音源 · 可直接播放
+            </div>
+          </div>
+        ) : showVideo ? (
+          <div style={{ height: '100%', padding: 16, boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: 12, background: '#000' }}>
+            <video ref={videoRef} controls autoPlay playsInline
+              src={videoSrc}
+              style={{ width: '100%', flex: 1, minHeight: 0, background: '#000', borderRadius: 8 }} />
+            <div style={{ fontSize: 12, color: '#cfcfcf', textAlign: 'center' }}>
+              视频生成结果 · 可全屏 / 下载（原生播放器，进度条可控）
             </div>
           </div>
         ) : tab === 'preview' && canPreview ? (

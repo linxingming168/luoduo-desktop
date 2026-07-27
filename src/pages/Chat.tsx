@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Bot, Plus, MessageSquarePlus, BrainCircuit, Navigation, MessageSquare, Trash2 } from 'lucide-react';
+import { Bot, Plus, MessageSquarePlus, BrainCircuit, Navigation, MessageSquare, Trash2, Search, Download } from 'lucide-react';
 import { api, ROSTER } from '../api/client';
 import type { Agent } from '../api/types';
 import ChatMessage from '../components/ChatMessage';
@@ -74,11 +74,15 @@ export default function Chat({ initialAgent }: { initialAgent?: string }) {
   // 🔒 附件链路（2026-07-26 修复：原 onFile/onDir 是空壳，选了文件毫无反应）
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [attachNote, setAttachNote] = useState('');
+  const [search, setSearch] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // 当前会话派生
   const activeConv = conversations.find(c => c.id === activeId);
   const messages = activeConv?.messages ?? [];
+  const visibleMessages = search.trim()
+    ? messages.filter(m => (m.text || '').toLowerCase().includes(search.trim().toLowerCase()))
+    : messages;
 
   // 启动即加载本地历史（跨更新不丢失，长记忆上下文）
   useEffect(() => {
@@ -266,6 +270,31 @@ export default function Chat({ initialAgent }: { initialAgent?: string }) {
     });
   };
 
+  // 导出当前会话为 Markdown（长记忆可带走）
+  const exportConv = () => {
+    if (!activeConv) return;
+    const who = (role: string) => role === 'user' ? '我' : (role || 'AI');
+    const lines = [
+      `# ${activeConv.title || '对话'}`, '',
+      `> 智能体：${activeConv.agentId ? (ROSTER[activeConv.agentId]?.label || activeConv.agentId) : '自由对话'}`,
+      `> 更新：${new Date(activeConv.updatedAt).toLocaleString()}`,
+      `> 消息数：${activeConv.messages.length}`, '',
+    ];
+    activeConv.messages.forEach(m => {
+      lines.push(`## ${who(m.role)}`);
+      lines.push(m.text || '');
+      if (m.artifact) lines.push('', `> 产物[${m.artifact.type}]：${m.artifact.title}${m.artifact.url ? ' — ' + m.artifact.url : ''}`);
+      lines.push('');
+    });
+    const md = lines.join('\n');
+    const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `${(activeConv.title || 'conversation').replace(/[\\/:*?"<>|]/g, '_')}.md`;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div style={{ height: '100%', display: 'flex', fontFamily: 'sans-serif', background: '#ffffff', color: '#1a1a1a' }}>
       {/* Sidebar: 会话历史 + 智能体列表 */}
@@ -329,6 +358,17 @@ export default function Chat({ initialAgent }: { initialAgent?: string }) {
             {agentId ? `· ${ROSTER[agentId]?.label || agentId}` : '· 自由对话'}
           </span>
           <div style={{ flex: 1 }} />
+          {/* 搜索当前对话 */}
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="搜索对话"
+            style={{ padding: '5px 10px', border: '1px solid #ebebeb', borderRadius: 8, fontSize: 12, width: 140, outline: 'none', color: '#1a1a1a' }}
+          />
+          {/* 导出当前对话为 MD */}
+          <button onClick={exportConv} title="导出当前对话为 Markdown" style={{ marginLeft: 6, padding: '5px 10px', border: '1px solid #ebebeb', borderRadius: 8, background: '#fff', cursor: 'pointer', color: '#4b5563', display: 'inline-flex', alignItems: 'center' }}>
+            <Download size={14} />
+          </button>
           <div style={{ display: 'flex', background: '#f5f5f5', borderRadius: 8, padding: 2 }}>
             <button onClick={() => { setAgentId(undefined); markAgent(undefined); }}
               style={{ padding: '4px 12px', borderRadius: 6, fontSize: 12, border: 'none', cursor: 'pointer',
@@ -355,7 +395,11 @@ export default function Chat({ initialAgent }: { initialAgent?: string }) {
                 <p style={{ fontSize: 12, marginTop: 6, color: '#c0c0c0' }}>让我生成网页 / 小游戏，右侧会自动开预览面板</p>
               </div>
             </div>
-          ) : messages.map((m, i) => (
+          ) : visibleMessages.length === 0 ? (
+            <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', fontSize: 13 }}>
+              无匹配「{search}」的对话
+            </div>
+          ) : visibleMessages.map((m, i) => (
             <ChatMessage
               key={i}
               msg={m}
