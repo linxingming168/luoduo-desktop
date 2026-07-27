@@ -73,7 +73,8 @@
         "nsis"
       ],
       "icon": "resources/icon.png"
-    }
+    },
+    "artifactName": "luoduo-desktop-setup-${version}.${ext}"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
