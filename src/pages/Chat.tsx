@@ -138,7 +138,7 @@ export default function Chat({ initialAgent }: { initialAgent?: string }) {
   const handleOpenMusic = async () => {
     const key = localStorage.getItem('luoduo_audiolib_key') || '';
     if (!key) { alert('未配置 AudioLib Key。请到「设置」页填写（audiolib.ai 注册免费获取），即可听开放原创音乐。'); return; }
-    const library = (window.prompt('选择风格曲库（如 lofi / focus / rock / sleep，默认 lofi）', 'lofi') || 'lofi').trim();
+    const library = (window.prompt('选择风格曲库（需完整库名，如 audio.lo-fi / focus / sleep，默认 audio.lo-fi）', 'audio.lo-fi') || 'audio.lo-fi').trim();
     try {
       const r = await fetch('https://api.audiolib.ai/v1/audio', {
         method: 'POST',
