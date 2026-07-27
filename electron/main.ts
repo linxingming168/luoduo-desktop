@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Tray, Menu, nativeImage, ipcMain, shell } from 'electron';
+import { app, BrowserWindow, Tray, Menu, nativeImage, ipcMain, shell, dialog } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import { exec } from 'child_process';
@@ -242,15 +242,27 @@ autoUpdater.on('download-progress', (progress) => {
   }
 });
 
-autoUpdater.on('update-downloaded', () => {
-  console.log('[updater] 下载完成，3秒后安装重启');
+autoUpdater.on('update-downloaded', (info) => {
+  console.log('[updater] 下载完成，弹窗引导用户前台安装（规避未签名 exe 静默装被 SmartScreen 拦截）');
   if (mainWindow && !mainWindow.isDestroyed()) {
-    mainWindow.webContents.send('update-downloaded', {});
+    mainWindow.webContents.send('update-downloaded', { version: info.version, file: info.downloadedFile });
   }
-  // 通知渲染进程后自动安装并重启
-  setTimeout(() => {
-    autoUpdater.quitAndInstall(false, true);
-  }, 5000);
+  // 关键修复（2026-07-27）：不再 autoUpdater.quitAndInstall 静默装——未签名 installer 静默运行
+  // 会被 Windows SmartScreen/Defender 拦截，导致"卸了旧版却装不上新版"、客户端消失。
+  // 改为弹窗引导用户前台打开安装包，由用户交互放行 SmartScreen（点"仍要运行"），安装成功。
+  dialog.showMessageBox({
+    type: 'info',
+    title: '更新已就绪',
+    message: `新版本 ${info.version} 已下载完成。点击「安装」打开安装包；若遇 Windows 安全提示，请点"仍要运行"。`,
+    buttons: ['安装', '稍后'],
+    defaultId: 0,
+    cancelId: 1,
+  }).then(({ response }) => {
+    if (response === 0 && (info as any).downloadedFile) {
+      try { shell.openPath((info as any).downloadedFile); }
+      catch (e) { console.error('[updater] 打开安装包失败', e); }
+    }
+  });
 });
 
 autoUpdater.on('error', (err) => {
