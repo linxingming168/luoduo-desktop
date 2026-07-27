@@ -1,5 +1,6 @@
 import { app, BrowserWindow, Tray, Menu, nativeImage, ipcMain, shell } from 'electron';
 import * as path from 'path';
+import * as fs from 'fs';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import https from 'https';
@@ -267,6 +268,34 @@ ipcMain.handle('check-for-updates', async () => {
 
 ipcMain.handle('quit-and-install', () => {
   autoUpdater.quitAndInstall(false, true);
+});
+
+// ============ 对话本地持久化（跨更新不丢失，客户端长记忆上下文） ============
+// 存于 userData/conversations.json：electron-updater / NSIS 重装均保留 userData，
+// 因此升级后历史对话完整保留，参照 WorkBuddy 的本地长记忆行为。
+const CONV_FILE = path.join(app.getPath('userData'), 'conversations.json');
+
+ipcMain.handle('conversations-load', async () => {
+  try {
+    if (!fs.existsSync(CONV_FILE)) return { conversations: [], activeId: null };
+    const raw = fs.readFileSync(CONV_FILE, 'utf-8');
+    const data = JSON.parse(raw);
+    if (!data || !Array.isArray(data.conversations)) return { conversations: [], activeId: null };
+    return data;
+  } catch {
+    return { conversations: [], activeId: null };
+  }
+});
+
+ipcMain.handle('conversations-save', async (_event, data: any) => {
+  try {
+    const tmp = CONV_FILE + '.tmp';
+    fs.writeFileSync(tmp, JSON.stringify(data), 'utf-8');
+    fs.renameSync(tmp, CONV_FILE); // 原子替换，避免半写损坏
+    return { ok: true };
+  } catch (e: any) {
+    return { ok: false, error: e?.message };
+  }
 });
 
 // App lifecycle

@@ -14,6 +14,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
   checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
   quitAndInstall: () => ipcRenderer.invoke('quit-and-install'),
+  // 对话本地持久化（跨更新长记忆）
+  loadConversations: () => ipcRenderer.invoke('conversations-load'),
+  saveConversations: (data: any) => ipcRenderer.invoke('conversations-save', data),
   onUpdateAvailable: (callback: (info: any) => void) => {
     ipcRenderer.on('update-available', (_event, info) => callback(info));
   },
