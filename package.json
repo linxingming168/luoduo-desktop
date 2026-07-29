@@ -1,6 +1,6 @@
 {
   "name": "luoduo-desktop",
-  "version": "2.1.38",
+  "version": "2.1.40",
   "description": "兴华AI军团·落朵大脑 桌面原生客户端",
   "author": {
     "name": "惠州市兴华科技有限公司",
@@ -21,10 +21,14 @@
     "@xyflow/react": "^12.11.2",
     "axios": "^1.6.0",
     "electron-updater": "^6.8.9",
+    "jszip": "^3.10.1",
     "lucide-react": "^0.300.0",
+    "mammoth": "^1.8.0",
+    "pdfjs-dist": "^4.10.38",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-markdown": "^9.0.0"
+    "react-markdown": "^9.0.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/react": "^18.2.0",

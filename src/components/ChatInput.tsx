@@ -44,7 +44,7 @@ export default function ChatInput({ value, onChange, onSend, onStop, onFile, onD
           <Paperclip className="w-4 h-4" />
         </button>
         <input ref={fileRef} type="file" className="hidden" onChange={onFile} multiple
-          accept=".txt,.md,.json,.csv,.tsv,.log,.xml,.yml,.yaml,.ini,.conf,.html,.htm,.css,.js,.ts,.tsx,.jsx,.py,.sh,.bat,.sql,.java,.c,.cpp,.h,.go,.rs,.php,.rb,.vue,.png,.jpg,.jpeg,.gif,.webp,.bmp" />
+          accept=".txt,.md,.json,.csv,.tsv,.log,.xml,.yml,.yaml,.ini,.conf,.html,.htm,.css,.js,.ts,.tsx,.jsx,.py,.sh,.bat,.sql,.java,.c,.cpp,.h,.go,.rs,.php,.rb,.vue,.png,.jpg,.jpeg,.gif,.webp,.bmp,.xlsx,.xls,.doc,.docx,.pdf,.ppt,.pptx" />
 
         {/* Folder */}
         <button onClick={() => dirRef.current?.click()}
